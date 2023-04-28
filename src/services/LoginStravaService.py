@@ -1,4 +1,4 @@
-from src.collectData.loadProperties import *
+from src.config.LoadProperties import *
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By

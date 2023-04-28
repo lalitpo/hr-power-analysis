@@ -1,4 +1,4 @@
-from src.collectData.loginStrava import *
+from src.services.LoginStravaService import *
 import json
 
 
