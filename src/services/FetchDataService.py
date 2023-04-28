@@ -13,6 +13,7 @@ stream_types = configs.get("stream_types").data.split(",")
 
 for activity in activity_ids:
     url = get_activity_url(activity.strip())
+    driver.implicitly_wait(10)                  # latency so that strava doesn't block us for scraping using a bot.
     driver.get(url)
     pre = driver.find_element(By.TAG_NAME, "pre").text
     data = json.loads(pre)
