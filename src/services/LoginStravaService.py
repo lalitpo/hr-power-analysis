@@ -10,7 +10,8 @@ options = Options()
 options.headless = True
 options.add_argument("--window-size=1920,1200")
 
-# No Need to download chromedriver, this installs everytime
+# TODO - Add options as the first argument once the application is complete and ready to fetch the data in headless mode
+# No Need to download chromedriver, this installs driver everytime
 # to avoid downloading manually every new patch or version of Chrome.
 driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
 
