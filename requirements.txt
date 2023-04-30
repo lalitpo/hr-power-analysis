@@ -1,3 +1,4 @@
 jproperties~=2.1.1
 selenium~=4.9.0
 pipenv~=2023.4.20
+pymongo~=4.3.3
