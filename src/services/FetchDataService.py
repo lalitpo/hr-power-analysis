@@ -17,6 +17,7 @@ def get_activity_url(activity_id):
 activity_ids = open('../../resources/activity-id.txt').readlines()
 
 data = ""
+hr_power_db = connect_database(configs.get("hr-power-db-url").data)
 
 for activity in activity_ids:
     url = get_activity_url(activity.strip())
@@ -28,6 +29,6 @@ for activity in activity_ids:
     activity_info = {"activity_id": activity.strip()}
     data.update(activity_info)
     print(data)
-    store_records(data)
+    store_records(data, hr_power_db)
 
 

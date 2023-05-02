@@ -1,4 +1,3 @@
-from src.config.LoadProperties import *
 import pymongo
 
 
@@ -11,10 +10,9 @@ def store_athlete_activity(record, athletic_data_coll):
     pass
 
 
-def store_records(record):
-    hr_power_db = connect_database(configs.get("hr-power-db-url").data)
-    store_athlete_info(record, hr_power_db)
-    athletic_data = hr_power_db["Athletic-Data"]
+def store_records(record, db_conn):
+    store_athlete_info(record, db_conn)
+    athletic_data = db_conn["Athletic-Data"]
     store_athlete_activity(record, athletic_data)
 
 
