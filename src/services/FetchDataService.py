@@ -49,38 +49,38 @@ intervals = create_interval_list()
 
 def get_activity_ids(athlete_id):
     weekly_urls = get_weekly_urls(intervals)
-    string_start = "www.strava.com%2Factivities%2F"
-    string_end = "%3F"
 
     activity_ids_list = []
     for week_url in weekly_urls:
         week_url = week_url.replace("athlete_id", athlete_id)
         driver.get(week_url)
-        div_element = driver.find_element(By.CSS_SELECTOR, "div.content.react-feed-component").get_attribute("outerHTML")
+        time.sleep(10)  # latency so that strava doesn't block us for scraping using a bot.
+        div_element = driver.find_element(By.CSS_SELECTOR, "div.content.react-feed-component").get_attribute(
+            "outerHTML")
         # parse the HTML using BeautifulSoup
         attribute_list = BeautifulSoup(div_element, 'html.parser').contents[0].__getattribute__("attrs")
         activity_list = json.loads(attribute_list["data-react-props"])['appContext']['preFetchedEntries']
         for activity in activity_list:
-            activity_id = activity['rowData']['activities'][0]['entity_id']
-            activity_ids_list.extend(activity_id)
-        #cur_week_activities = re.findall(f'{string_start}(.*?){string_end}', div_element)
-        #
-        print("abc")
+            if activity['entity'] == "GroupActivity":
+                activity_ids_list.append(str(activity['rowData']['activities'][0]['entity_id']))
+            elif activity['entity'] == "Activity":
+                activity_ids_list.append(activity['activity']['id'])
     return activity_ids_list
 
 
-def store_activities_data(activities_list):
+def store_activities_data(athlete_id, activities_list):
     for activity in activities_list:
         time.sleep(5)  # latency so that strava doesn't block us for scraping using a bot.
         driver.get(act_data_url.replace("activity_id", activity))
         pre = driver.find_element(By.TAG_NAME, "pre").text
-        data = json.loads(pre)
-        activity_info = {"activity_id": activity.strip()}
-        data.update(activity_info)
-        store_records(data, hr_power_db)
+        athlete_data = json.loads(pre)
+        if len(athlete_data['watts']) > 7200:
+            activity_info = {"athlete_id": athlete_id, "activity_id": activity.strip()}
+            athlete_data.update(activity_info)
+            store_records(athlete_data, hr_power_db)
 
 
 for athlete in athlete_ids:
     act_data_url = create_activity_url()
     activities_ids_list = get_activity_ids(athlete.strip())
-    store_activities_data(activities_ids_list)
+    store_activities_data(athlete.strip(), activities_ids_list)
