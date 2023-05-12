@@ -2,20 +2,13 @@ import pymongo
 
 
 def store_athlete_info(record, athlete_info_coll):
-    athlete_info_coll.insert_one(record)
+    athlete_info_coll.insert_many(record)
     pass
 
 
 def store_athlete_activity(record, activity_data_coll):
-    activity_data_coll.insert_one(record)
+    activity_data_coll.insert_many(record)
     pass
-
-
-def store_records(record, db_conn):
-    athlete_info = db_conn["Athlete-Info"]
-    store_athlete_info(record, athlete_info)
-    activity_data = db_conn["Activity-Data"]
-    store_athlete_activity(record, activity_data)
 
 
 def connect_database(db_uri):

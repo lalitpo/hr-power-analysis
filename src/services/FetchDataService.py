@@ -44,6 +44,8 @@ def get_weekly_urls(intervals_list):
     return activity_url_list
 
 
+base_act_data_url = create_activity_url()
+
 intervals = create_interval_list()
 
 
@@ -68,19 +70,38 @@ def get_activity_ids(athlete_id):
     return activity_ids_list
 
 
-def store_activities_data(athlete_id, activities_list):
+def store_activities_data(athlete_details, activities_list):
     for activity in activities_list:
         time.sleep(5)  # latency so that strava doesn't block us for scraping using a bot.
-        driver.get(act_data_url.replace("activity_id", activity))
+        driver.get(base_act_data_url.replace("activity_id", activity))
         pre = driver.find_element(By.TAG_NAME, "pre").text
-        athlete_data = json.loads(pre)
-        if len(athlete_data['watts']) > 7200:
-            activity_info = {"athlete_id": athlete_id, "activity_id": activity.strip()}
-            athlete_data.update(activity_info)
-            store_records(athlete_data, hr_power_db)
+        activity_data = json.loads(pre)
+        activities_stored = []
+        if len(activity_data['watts']) > 7200:
+            activity_info = {"activity_id": activity.strip()}
+            activity_data.update(activity_info)
+            activity_data_conn = hr_power_db["Activity-Data"]
+            store_athlete_activity(activity_data, activity_data_conn)
+            activities_stored.append(activity)
+        athlete_data = {"athlete_name": athlete_details['athlete_name'], "athlete_id": athlete_details['athlete_id'],
+                        "location": athlete_details['location'], "activities_ids": activities_stored}
+        athlete_info_conn = hr_power_db["Athlete-Info"]
+        store_athlete_info(athlete_data, athlete_info_conn)
+
+
+def get_athlete_info(athlete_id):
+    athlete_url = configs.get("strava-url").data + "/pros/" + athlete_id
+    driver.get(athlete_url)
+    athlete_name = driver.find_element(By.CSS_SELECTOR, "h1.text-title1.athlete-name").text
+    athlete_location = driver.find_element(By.CSS_SELECTOR, "div.location").text
+    athlete_details = {"athlete_name": athlete_name,
+                       "athlete_id": athlete_id,
+                       "location": athlete_location}
+    return athlete_details
 
 
 for athlete in athlete_ids:
-    act_data_url = create_activity_url()
+    athlete_info = get_athlete_info(athlete.strip())
     activities_ids_list = get_activity_ids(athlete.strip())
-    store_activities_data(athlete.strip(), activities_ids_list)
+    store_activities_data(athlete_info, activities_ids_list)
+    print("Data stored for athlete :" + athlete_info['athlete_name'])
