@@ -2,12 +2,12 @@ import pymongo
 
 
 def store_athlete_info(record, athlete_info_coll):
-    athlete_info_coll.insert_many(record)
+    athlete_info_coll.insert_one(record)
     pass
 
 
 def store_athlete_activity(record, activity_data_coll):
-    activity_data_coll.insert_many(record)
+    activity_data_coll.insert_one(record)
     pass
 
 
