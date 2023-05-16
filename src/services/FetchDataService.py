@@ -61,9 +61,8 @@ def get_activity_ids(ath_id):
     for week_url in weekly_urls:
         week_url = week_url.replace(athlete_id, ath_id)
         driver.get(week_url)
-        wait = WebDriverWait(driver, 20)
-        wait.until(EC.visibility_of_element_located((By.CSS_SELECTOR, "div.content.react-feed-component")))
-
+        time.sleep(10)
+        driver.get(week_url)
         div_element = driver.find_element(By.CSS_SELECTOR, "div.content.react-feed-component").get_attribute(
             "outerHTML")
         # parse the HTML using BeautifulSoup
@@ -73,13 +72,10 @@ def get_activity_ids(ath_id):
         print("Week :" + week_url)
         for act in activity_list:
             if act[entity] == "GroupActivity" and act[rowData][activities][0][activity_type] == ride:
-                print(str(act[rowData][activities][0][entity+'_'+id]))
-                activity_ids_list.append(str(act[rowData][activities][0][entity+'_'+id]))
+                activity_ids_list.append(str(act[rowData][activities][0][entity + '_' + id]))
             elif act[entity] == "Activity" and act[activity][activity_type] == ride:
-                print(act[activity][id])
                 activity_ids_list.append(act[activity][id])
-
-        time.sleep(5)
+        time.sleep(10)
         print("Week :" + week_url + " over.")
     return activity_ids_list
 
@@ -88,12 +84,12 @@ def store_activities_data(athlete_details, activities_list):
     activities_stored = []
     for act in activities_list:
         time.sleep(5)  # latency so that strava doesn't block us for scraping using a bot.
-        driver.get(base_act_data_url.replace(activity+'_'+id, act))
+        driver.get(base_act_data_url.replace(activity + '_' + id, act))
         pre = driver.find_element(By.TAG_NAME, "pre").text
         activity_data = json.loads(pre)
-        print("url : " + base_act_data_url.replace(activity+'_'+id, act))
+        print("url : " + base_act_data_url.replace(activity + '_' + id, act))
         if watts in activity_data and len(activity_data[watts]) > 7200:
-            activity_info = {activity+'_'+id: act.strip()}
+            activity_info = {activity + '_' + id: act.strip()}
             activity_data.update(activity_info)
             activity_data_conn = hr_power_db["Activity-Data"]
             store_athlete_activity(activity_data, activity_data_conn)
@@ -118,5 +114,6 @@ def get_athlete_info(athl_id):
 for athlete in athlete_ids:
     athlete_info = get_athlete_info(athlete.strip())
     activities_ids_list = get_activity_ids(athlete.strip())
+    print("activity ids for athlete " + athlete_info[athlete_name] + ":" + ", ".join(activities_ids_list))
     store_activities_data(athlete_info, activities_ids_list)
     print("Data stored for athlete :" + athlete_info[athlete_name])
