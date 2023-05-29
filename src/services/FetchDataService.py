@@ -56,60 +56,70 @@ def get_weekly_urls():
 
 def get_activity_ids(ath_id):
     weekly_urls = get_weekly_urls()
+    try:
+        activity_ids_list = []
+        for week_url in weekly_urls:
+            week_url = week_url.replace(athlete_id, ath_id)
+            driver.get(week_url)
+            time.sleep(5)
+            div_element = driver.find_element(By.CSS_SELECTOR, "div.content.react-feed-component").get_attribute(
+                "outerHTML")
+            # parse the HTML using BeautifulSoup
+            attribute_list = BeautifulSoup(div_element, 'html.parser').contents[0].__getattribute__("attrs")
+            activity_list = json.loads(attribute_list["data-react-props"])['appContext']['preFetchedEntries']
 
-    activity_ids_list = []
-    for week_url in weekly_urls:
-        week_url = week_url.replace(athlete_id, ath_id)
-        driver.get(week_url)
-        time.sleep(5)
-        div_element = driver.find_element(By.CSS_SELECTOR, "div.content.react-feed-component").get_attribute(
-            "outerHTML")
-        # parse the HTML using BeautifulSoup
-        attribute_list = BeautifulSoup(div_element, 'html.parser').contents[0].__getattribute__("attrs")
-        activity_list = json.loads(attribute_list["data-react-props"])['appContext']['preFetchedEntries']
-
-        for act in activity_list:
-            if act[entity] == "GroupActivity" and act[rowData][activities][0][activity_type] == ride:
-                activity_ids_list.append(str(act[rowData][activities][0][entity + '_' + id]))
-            elif act[entity] == "Activity" and act[activity][activity_type] == ride:
-                activity_ids_list.append(act[activity][id])
-    return list(set(activity_ids_list))
+            for act in activity_list:
+                if act[entity] == "GroupActivity" and act[rowData][activities][0][activity_type] == ride:
+                    activity_ids_list.append(str(act[rowData][activities][0][entity + '_' + id]))
+                elif act[entity] == "Activity" and act[activity][activity_type] == ride:
+                    activity_ids_list.append(act[activity][id])
+        return list(set(activity_ids_list))
+    except Exception as e:
+        print("Error occurred while getting activity ids:", str(e))
 
 
 def save_activity_data(activities_list):
     activities_stored = []
     for act in activities_list:
-        time.sleep(5)  # latency so that strava doesn't block us for scraping using a bot.
-        driver.get(strava_url + "/activities/" + act)
-        activity_summary = driver.find_element(By.CSS_SELECTOR, "div.details").get_attribute(
-            "outerHTML")
-        meta_data = BeautifulSoup(activity_summary, 'html.parser').text
-        activity_meta_data = re.split(r'\n+', meta_data)
-        main_stats_div = driver.find_element(By.CSS_SELECTOR, "div.spans8.activity-stats.mt-md.mb-md").get_attribute(
-            "outerHTML")
-        main_stats_list = BeautifulSoup(main_stats_div, 'html.parser').contents[0].__getattribute__("contents")
-        head_data = re.split(r'\n+', main_stats_list[1].text)
-        time.sleep(5)  # latency so that strava doesn't block us for scraping using a bot.
-        driver.get(base_act_data_url.replace(activity + '_' + id, act))
-        pre = driver.find_element(By.TAG_NAME, "pre").text
-        activity_info = json.loads(pre)
-        activity_duration_split = head_data[3].split(':')
-        if len(activity_duration_split) == 2:
-            activity_duration = datetime.timedelta(minutes=int(activity_duration_split[0]),
-                                                   seconds=int(activity_duration_split[1]))
-        else:
-            activity_duration = datetime.timedelta(hours=int(activity_duration_split[0]),
-                                                   minutes=int(activity_duration_split[1]),
-                                                   seconds=int(activity_duration_split[2]))
-        if watts in activity_info:
-            activity_data = {activity + '_' + id: act.strip(),
-                             "activity_date": dt.strptime(activity_meta_data[1].split(', ')[1], '%d %B %Y').date(),
-                             "activity_distance": head_data[1].split(' ')[0],
-                             "activity_duration": str(activity_duration),
-                             "elevation": head_data[5].replace(',', '').split(' ')[0]}
-            activity_data.update(activity_info)
-            save_data(activity_data, "athletic-data")
-            activities_stored.append(act)
+        try:
+            time.sleep(5)  # latency so that strava doesn't block us for scraping using a bot.
+            driver.get(strava_url + "/activities/" + act)
+            activity_summary = driver.find_element(By.CSS_SELECTOR, "div.details").get_attribute(
+                "outerHTML")
+            meta_data = BeautifulSoup(activity_summary, 'html.parser').text
+            activity_meta_data = re.split(r'\n+', meta_data)
+            main_stats_div = driver.find_element(By.CSS_SELECTOR,
+                                                 "div.spans8.activity-stats.mt-md.mb-md").get_attribute(
+                "outerHTML")
+            main_stats_list = BeautifulSoup(main_stats_div, 'html.parser').contents[0].__getattribute__("contents")
+            head_data = re.split(r'\n+', main_stats_list[1].text)
+            time.sleep(5)  # latency so that strava doesn't block us for scraping using a bot.
+            driver.get(base_act_data_url.replace(activity + '_' + id, act))
+            pre = driver.find_element(By.TAG_NAME, "pre").text
+            activity_info = json.loads(pre)
+            if 's' in head_data[3]:
+                activity_duration = "00:00" + head_data[3][:-1]
+            else:
+                activity_duration_split = head_data[3].split(':')
+                if len(activity_duration_split) == 2:
+                    activity_duration = datetime.timedelta(minutes=int(activity_duration_split[0]),
+                                                           seconds=int(activity_duration_split[1]))
+                else:
+                    activity_duration = datetime.timedelta(hours=int(activity_duration_split[0]),
+                                                           minutes=int(activity_duration_split[1]),
+                                                           seconds=int(activity_duration_split[2]))
+            if watts in activity_info:
+                elev = head_data[5].replace(',', '').split(' ')[0]
+                activity_data = {activity + '_' + id: act.strip(),
+                                 "activity_date": dt.strptime(activity_meta_data[1].split(', ')[1], '%d %B %Y').date(),
+                                 "activity_distance": head_data[1].split(' ')[0],
+                                 "activity_duration": str(activity_duration),
+                                 "elevation": '0' if elev == '' else elev}
+                activity_data.update(activity_info)
+                save_data(activity_data, "athletic-data")
+                activities_stored.append(act)
+        except Exception as e:
+            print("Error occurred while saving activity data:", str(e), act)
     return activities_stored
 
 
@@ -127,15 +137,16 @@ def get_athlete_info(athl_id):
     athlete_url = strava_url + "/pros/" + athl_id
     driver.get(athlete_url)
     ath_name = driver.find_element(By.CSS_SELECTOR, "h1.text-title1.athlete-name").text
+    athlete_location = "NA"
     try:
-        athlete_location = driver.find_element(By.CSS_SELECTOR, "div.location")
+        athlete_location = driver.find_element(By.CSS_SELECTOR, "div.location").text
     # Perform actions with the found element
     except NoSuchElementException:
-        athlete_location = "NA"
+        print("Location not present for athlete :" + ath_name + "athlete_id" + athl_id)
 
     athlete_details = {"athlete_name": ath_name,
                        "athlete_id": athl_id,
-                       "location": athlete_location.text}
+                       "location": athlete_location}
     print(athlete_details)
     return athlete_details
 
