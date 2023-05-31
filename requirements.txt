@@ -1,5 +1,7 @@
 jproperties~=2.1.1
 selenium==4.9.1
-pipenv==2023.4.29
+pipenv==2023.5.19
 pymongo~=4.3.3
 beautifulsoup4~=4.12.2
+pandas~=2.0.2
+numpy~=1.24.3

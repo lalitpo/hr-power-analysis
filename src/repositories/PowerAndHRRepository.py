@@ -1,4 +1,5 @@
 import psycopg2
+import pandas as pd
 from src.config.LoadProperties import *
 
 
@@ -6,6 +7,10 @@ def create_table(table1, table2):
     hr_power_db_conn.cursor().execute(table1)
     hr_power_db_conn.cursor().execute(table2)
     hr_power_db_conn.commit()
+
+
+def get_athletic_data():
+    return pd.read_sql(configs.get("athletic-record-query").data, hr_power_db_conn)
 
 
 def save_data(strava_data, table):
