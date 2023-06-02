@@ -140,10 +140,10 @@ def get_athlete_info(athl_id):
     athlete_location = "NA"
     try:
         athlete_location = driver.find_element(By.CSS_SELECTOR, "div.location").text
-    # Perform actions with the found element
     except NoSuchElementException:
         print("Location not present for athlete :" + ath_name + "athlete_id" + athl_id)
 
+    # Perform actions with the found element
     athlete_details = {"athlete_name": ath_name,
                        "athlete_id": athl_id,
                        "location": athlete_location}
