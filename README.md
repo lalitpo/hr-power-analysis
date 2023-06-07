@@ -65,7 +65,7 @@ This section should list any major frameworks/libraries used to bootstrap your p
 
 
 
-<!-- GETTING STARTED -->
+<!-- GETTING STARTED 
 ## Getting Started
 
 This is an example of how you may give instructions on setting up your project locally.
@@ -94,25 +94,25 @@ _Below is an example of how you can instruct your audience on installing and set
    ```
 4. Enter your API in `config.js`
    ```js
-   const API_KEY = 'ENTER YOUR API';
+   const API_KEY = 'ENTER YOUR API'; 
    ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 
-<!-- USAGE EXAMPLES -->
+<!-- USAGE EXAMPLES 
 ## Usage
 
 Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
 
-_For more examples, please refer to the [Documentation](https://example.com)_
+_For more examples, please refer to the [Documentation](https://example.com)_ -->
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 
-<!-- CONTRIBUTING -->
+<!-- CONTRIBUTING
 ## Contributing
 
 Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
@@ -126,8 +126,8 @@ Don't forget to give the project a star! Thanks again!
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
+ -->
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
-
 <!-- CONTACT -->
 ## Contact
 
