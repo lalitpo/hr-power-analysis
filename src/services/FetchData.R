@@ -1,4 +1,4 @@
-activity_df <- read.csv("/Users/lalitpoddar/Desktop/Uni/MS Project Thesis/hr-power-analysis/src/services/activity_data.csv",
+activity_df <- read.csv("/Users/lalitpoddar/Desktop/Uni/MS Project Thesis/codebase/hr-power-analysis/src/services/activity_data.csv",
                         stringsAsFactors = FALSE)
 
 # Convert list columns to integer lists
@@ -23,31 +23,22 @@ for (col in colnames(activity_df)) {
 }
 
 activity_8746996449 <- activity_df[activity_df$activity_id == 8746996449, ]
-# Convert lists to vectors
-power_8746996449 <- unlist(activity_8746996449$power)
-heartrate_8746996449 <- unlist(activity_8746996449$heartrate)
 
 # Create a new dataframe with values as columns
-activity_8746996449_data <- data.frame(power = unlist(activity_8746996449$power), heartrate = unlist(activity_8746996449$heartrate))
+activity_8746996449_data <- data.frame(power = unlist(activity_df[activity_df$activity_id == 8746996449, ] $power),
+                                       heartrate = unlist(activity_df[activity_df$activity_id == 8746996449, ] $heartrate))
 
-time_8746996449 <- seq(from = 1, to = length(activity_8746996449_data$power))
 activity_8746996449_data$id <- 1
-activity_8746996449_data$time <- time_8746996449
+activity_8746996449_data$time <- seq(from = 1, to = length(activity_8746996449_data$power))
 
 
 #--------------------------#
-#--------------------------#
-activity_8752058834 <- activity_df[activity_df$activity_id == 8752058834, ]
-# Convert lists to vectors
-power_8752058834  <- unlist(activity_8752058834$power)
-heartrate_8752058834  <- unlist(activity_8752058834$heartrate)
 
 # Create a new dataframe with values as columns
-activity_8752058834_data <- data.frame(power = power_8752058834 , heartrate = heartrate_8752058834)
-
-time_8752058834  <- seq(from = 1, to = length(activity_8752058834_data$power))
+activity_8752058834_data <- data.frame(power = unlist(activity_df[activity_df$activity_id == 8752058834, ]$power),
+                                       heartrate = unlist(activity_df[activity_df$activity_id == 8752058834, ]$heartrate))
 activity_8752058834_data$id <- 2
-activity_8752058834_data$time <- time_8752058834
+activity_8752058834_data$time <- seq(from = 1, to = length(activity_8752058834_data$power))
 
 
 #--------------------------#
