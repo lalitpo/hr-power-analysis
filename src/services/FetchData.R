@@ -1,5 +1,8 @@
 activity_df <- read.csv("/Users/lalitpoddar/Desktop/Uni/MS Project Thesis/codebase/hr-power-analysis/src/services/activity_data.csv",
                         stringsAsFactors = FALSE)
+#TODO: The data frame should be of type activity_info where element  at index 1 indicates all info about activity  1
+#activity_info = {{activityid : 312313123. heartrate : 123131312312331313, power: 123123123}, {activityid : 312313123. heartrate : 123131312312331313, power: 123123123}}
+
 
 # Convert list columns to integer lists
 for (col in colnames(activity_df)) {
@@ -22,6 +25,11 @@ for (col in colnames(activity_df)) {
   }
 }
 
+activity_8752058834_data <- data.frame(power = unlist(activity_df[activity_df$activity_id == 8752058834, ]$power),
+heartrate = unlist(activity_df[activity_df$activity_id == 8752058834, ]$heartrate))
+activity_8752058834_data$id <- 2
+activity_8752058834_data$time <- seq(from = 1, to = length(activity_8752058834_data$power))
+
 activity_8746996449 <- activity_df[activity_df$activity_id == 8746996449, ]
 
 # Create a new dataframe with values as columns
@@ -35,10 +43,6 @@ activity_8746996449_data$time <- seq(from = 1, to = length(activity_8746996449_d
 #--------------------------#
 
 # Create a new dataframe with values as columns
-activity_8752058834_data <- data.frame(power = unlist(activity_df[activity_df$activity_id == 8752058834, ]$power),
-                                       heartrate = unlist(activity_df[activity_df$activity_id == 8752058834, ]$heartrate))
-activity_8752058834_data$id <- 2
-activity_8752058834_data$time <- seq(from = 1, to = length(activity_8752058834_data$power))
 
 
 #--------------------------#

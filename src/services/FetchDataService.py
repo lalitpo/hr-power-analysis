@@ -11,6 +11,7 @@ from src.services.LoginStravaService import *
 from _datetime import datetime as dt
 
 athlete_ids = open('../../resources/pro-athlete-id.txt').readlines()
+html_parser = "html.parser"
 
 
 def create_activity_url():
@@ -26,7 +27,7 @@ minimum_activity_length = int(configs.get("min-activity-length-in-sec").data)
 def create_interval_list():
     data_collection_period = int(configs.get("data-collection-period-in-weeks").data)
     my_date = datetime.date.today()
-    year, week_num, day_of_week = my_date.isocalendar()
+    year, week_num, _ = my_date.isocalendar()
     interval_list = []
     while data_collection_period > 0:
         interval_list.append(str(year) + (str(week_num) if week_num > 9 else "0" + str(week_num)))
@@ -65,7 +66,7 @@ def get_activity_ids(ath_id):
             div_element = driver.find_element(By.CSS_SELECTOR, "div.content.react-feed-component").get_attribute(
                 "outerHTML")
             # parse the HTML using BeautifulSoup
-            attribute_list = BeautifulSoup(div_element, 'html.parser').contents[0].__getattribute__("attrs")
+            attribute_list = BeautifulSoup(div_element, html_parser).contents[0].__getattribute__("attrs")
             activity_list = json.loads(attribute_list["data-react-props"])['appContext']['preFetchedEntries']
 
             for act in activity_list:
@@ -86,12 +87,12 @@ def save_activity_data(activities_list):
             driver.get(strava_url + "/activities/" + act)
             activity_summary = driver.find_element(By.CSS_SELECTOR, "div.details").get_attribute(
                 "outerHTML")
-            meta_data = BeautifulSoup(activity_summary, 'html.parser').text
+            meta_data = BeautifulSoup(activity_summary, html_parser).text
             activity_meta_data = re.split(r'\n+', meta_data)
             main_stats_div = driver.find_element(By.CSS_SELECTOR,
                                                  "div.spans8.activity-stats.mt-md.mb-md").get_attribute(
                 "outerHTML")
-            main_stats_list = BeautifulSoup(main_stats_div, 'html.parser').contents[0].__getattribute__("contents")
+            main_stats_list = BeautifulSoup(main_stats_div, html_parser).contents[0].__getattribute__("contents")
             head_data = re.split(r'\n+', main_stats_list[1].text)
             time.sleep(5)  # latency so that strava doesn't block us for scraping using a bot.
             driver.get(base_act_data_url.replace(activity + '_' + id, act))
@@ -124,9 +125,7 @@ def save_activity_data(activities_list):
 
 
 def store_activities_data(athlete_details, activities_list):
-    # create the athletic data table with constraints.
     hr_power_db_conn.cursor().execute(configs.get("athletic-data-table-query").data)
-    # save the athletic data into the athletic-data table created.
     activities_saved = save_activity_data(activities_list)
     athlete_data = {athlete_name: athlete_details[athlete_name], athlete_id: athlete_details[athlete_id],
                     location: athlete_details[location], "activities_ids": [int(x) for x in activities_saved]}
@@ -143,7 +142,6 @@ def get_athlete_info(athl_id):
     except NoSuchElementException:
         print("Location not present for athlete :" + ath_name + "athlete_id" + athl_id)
 
-    # Perform actions with the found element
     athlete_details = {"athlete_name": ath_name,
                        "athlete_id": athl_id,
                        "location": athlete_location}
