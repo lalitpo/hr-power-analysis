@@ -4,19 +4,28 @@ password = "admin";
 
 conn = postgresql(username, password, 'Server', 'localhost', 'DatabaseName',"hrr-power-db", 'PortNumber', 5432);
 
-% % Extracting data for activity 8752058834
+% % Extracting data for a specific activity
 activityId = 8752058834
 testData = getTestData(conn, activityId)
 
 function testData = getTestData(conn, aId)
         sqlquery = "SELECT activity_id, heartrate, ""Power (in watts)"" " + ...
             "FROM ""athletic-data"" " + ...
-            "WHERE activity_id =" + aId;
-        data = fetch(conn,sqlquery);
-        %data = fetch(conn,sqlquery,'DataReturnFormat',"structure", 'MaxRows',5)
+            "WHERE activity_id ='" + aId + "'";
+        %data = fetch(conn,sqlquery);
+        %data = fetch(conn,sqlquery,"DataReturnFormat','cell')
         opts = databaseImportOptions(conn,sqlquery)
         vars = opts.SelectedVariableNames;
-        varOpts = getoptions(opts,vars)
+        opts = setoptions(opts,{'heartrate','Power (in watts)'}, ...
+        'Type','cellarray');
+        % vars = opts.SelectedVariableNames;
+        % varOpts = getoptions(opts,vars) 
+        % Import data using SQLImportOptions
+  %       disp([opts.VariableNames' opts.VariableTypes'])
+ %       vars = opts.SelectedVariableNames;
+  %      varOpts = getoptions(opts,vars)
+         data = fetch(conn,sqlquery, opts);
+
         testData = data
 end
 % 
