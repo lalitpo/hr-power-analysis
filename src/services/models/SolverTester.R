@@ -7,6 +7,7 @@ pseries_simulated <- numeric(3600)
 t <- 0
 p0 <- 100 + (30 * t / 180)
 
+#power calculated/simulated at the start of every second for piece wise constant.
 for (t in 1:3600) {
   pseries_simulated[t] <- 100 + (30 * floor(t / 180))
 }
@@ -18,6 +19,7 @@ hr_list_simulated <- numeric(length(3599))
 hr_list_simulated[1] <- (hrt_ivp + K_ivp*p0) + (exp(-1 / tau_ivp)) * (hr0_ivp - hrt_ivp - K_ivp*p0)
 
 #heart rate calculated at start of the time data point.
+#calculating it for 3600 would mean hr from 3600 to 3601 time data point.
 for (i in 2:3599) {   #the lastpoint is 3600/hr0 makes up the entire hr simulated/ loop should be until 3599/array length
   hr_list_simulated[i] <- (hrt_ivp + K_ivp*pseries_simulated[i-1]) + (exp(-1 / tau_ivp)) * (hr_list_simulated[i-1] - hrt_ivp - K_ivp*pseries_simulated[i-1])
 }
@@ -27,7 +29,7 @@ for (i in 2:3599) {   #the lastpoint is 3600/hr0 makes up the entire hr simulate
 hr_list_all <- c(hr0_ivp, hr_list_simulated)
 C_ <- -hr_list_simulated
 
- hr_derivative_ivp_test  <- numeric(length(pseries_simulated)-1)
+ hr_derivative_ivp_test  <- numeric(length(hr_list_simulated))
 
  for (i in 1:3599) {
      hr_derivative_ivp_test[i] <- (hrt_ivp + K_ivp*pseries_simulated[i]-hr_list_simulated[i])/tau_ivp
@@ -52,6 +54,7 @@ C_ <- -hr_list_simulated
  )
 
 #TODO : what was the length of derivative in calculate.glla too?
+# ANS : 3599
 # Add hr0 in the list of values for differentiation, to get 3599 values
  hr_derivative_glla <- calculate.glla(hr_list_all, 1:3600, 2, 1)$dsignal[, 2]
  hr_derivative_glla <- hr_derivative_glla[!is.na(hr_derivative_glla)]
@@ -64,35 +67,33 @@ C_ <- -hr_list_simulated
  )
 
 #TODO : what was the length of derivative in sg too?
- hr_derivative_savitzy_golay <- savgol(hr_list_all, 3599, forder = 4, dorder = 1)
- A_s_q2 <- cbind(hr_derivative_savitzy_golay, pseries_simulated[1:3599], rep(1, length(hr_derivative_savitzy_golay)))
- solution_sq2_test <- solve(t(A_s_q2) %*% A_s_q2) %*% t(A_s_q2) %*% C_
+# ANS : 3599
+hr_derivative_savitzy_golay <-  numeric(length(hr_list_all))
+ hr_derivative_savitzy_golay <- savgol(hr_list_all, 3599, forder = 2, dorder = 1)
+ A_s_q2 <- cbind(hr_derivative_savitzy_golay, pseries_simulated[1:3600], rep(1, length(hr_derivative_savitzy_golay)))
+ solution_sq2_test <- solve(t(A_s_q2) %*% A_s_q2) %*% t(A_s_q2) %*% -hr_list_all
  s_g2_results <- list(
    tau_lsm_sg = solution_sq2_test[[1]],
    k_lsm_sg = -solution_sq2_test[[2]],
    hreq_lsm_sg = -solution_sq2_test[[3]]
  )
+cat(paste(s_g2_results, collapse = " "))
+
  cat(paste(ivp_results, collapse = " "))
  cat(paste(basic_results, collapse = " "))
  cat(paste(s_g1_results, collapse = " "))
- cat(paste(s_g2_results, collapse = " "))
 
-HR_0 <- c(y=hr_list_all[1])
-exp_hr_new <- numeric(length(pseries_simulated))
-time_vector <- seq_along(pseries_simulated)
+#HR_0 <- c(y=hr_list_all[1])
+#exp_hr_new <- numeric(length(pseries_simulated))
+#time_vector <- seq_along(pseries_simulated)
 options(digits=15)
 est_hr <- numeric(3599)
 
 tau_test <- as.double(s_g2_results$tau_lsm_sg)
 k_test <- as.double(s_g2_results$k_lsm_sg)
 hr_eq_test <- as.double(s_g2_results$hreq_lsm_sg)
-
-
-tau_test <- 2
-k_test <- 0.05
-hr_eq_test <- 55
 hr0 <- hr0_ivp
-t<- 1
+
 
 predict_hr <- function(pow, t, hr) {
   hr_t <- (hr_eq_test + k_test*pow) + (exp(-t / tau_test)) * (hr - hr_eq_test - k_test*pow)
