@@ -107,8 +107,7 @@ solution_basic_test = (A_basic' * A_basic) \ (A_basic' * C_);
 basic_results = struct('tau_lsm_basic', solution_basic_test(1), 'k_lsm_basic', -solution_basic_test(2), 'hreq_lsm_basic', -solution_basic_test(3));
 
 % Calculate hr_derivative_savitzy_golay
-sg_filt = sgolayfilt(hr_list_simulated, 4, 3599);
-hr_derivative_basic_test
+hr_derivative_savitzy_golay = sgolayfilt(hr_list_simulated, 4, 3599);
 A_s_q2 = [hr_derivative_savitzy_golay, pseries_simulated(1:3599), ones(length(hr_derivative_savitzy_golay), 1)];
 
 % Solve for solution_sq2_test
