@@ -50,7 +50,8 @@ opts = setvaropts(opts, ["heartrate", "power"], "EmptyFieldRule", "auto");
 opts = setvaropts(opts, "activity_id", "ThousandsSeparator", ",");
 
 % Import the data
-athleticData = readtable("/Users/lalitpoddar/Desktop/Uni/MS Project Thesis/codebase/hr-power-analysis/src/services/models/athletic-data.csv", opts);
+relativePath = fullfile('models', 'athletic-data.csv');
+athleticData = readtable(relativePath, opts);
 
 
 %% Clear temporary variables
