@@ -57,8 +57,6 @@ This project is to assess and analyse the variation in heart rate and power outp
 
 ### Built With
 
-This section should list any major frameworks/libraries used to bootstrap your project. Leave any add-ons/plugins for the acknowledgements section. Here are a few examples.
-
 * [![Python][Python]][python-url]
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
