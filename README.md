@@ -59,7 +59,7 @@ This project is to assess and analyse the variation in heart rate and power outp
 
 * [![Python][Python]][python-url]
 * [![R][R]][R-url]
-* [![Matlab][Matlab]][matlab-url]
+* [![Matlab][Matlab =250x250]][matlab-url]
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
@@ -157,6 +157,6 @@ This project is developed under the guidance and support of Prof. Dr. Dietmar Sa
 [python-url]: https://www.python.org/
 [R]: https://www.r-project.org/Rlogo.png
 [R-url]: https://www.r-project.org/
-[Matlab]: ![](https://play-lh.googleusercontent.com/UB0D2bAS6M4gGtaXPbhD8zK6bRrw_KkTeNMuZ_fkx32WC_OPPeQcKmH7AiID41xDc2k=w480-h960 =250x250)
+[Matlab]: https://play-lh.googleusercontent.com/UB0D2bAS6M4gGtaXPbhD8zK6bRrw_KkTeNMuZ_fkx32WC_OPPeQcKmH7AiID41xDc2k=w480-h960
 [matlab-url]: https://in.mathworks.com/products/matlab.html/
 
