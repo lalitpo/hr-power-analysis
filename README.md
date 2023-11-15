@@ -158,5 +158,5 @@ This project is developed under the guidance and support of Prof. Dr. Dietmar Sa
 [R]: https://en.wikipedia.org/wiki/R_%28programming_language%29#/media/File:R_logo.svg
 [R-url]: https://www.r-project.org
 [Matlab]: https://en.wikipedia.org/wiki/MATLAB#/media/File:Matlab_Logo.png
-[matlab-url] : https://in.mathworks.com/products/matlab.html
+[matlab-url]: https://in.mathworks.com/products/matlab.html
 
