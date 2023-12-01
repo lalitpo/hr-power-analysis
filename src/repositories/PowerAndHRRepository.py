@@ -3,7 +3,7 @@ import psycopg2
 from psycopg2 import extensions
 from sqlalchemy import create_engine
 
-from src.config.LoadProperties import *
+import src.config.LoadProperties
 
 
 def save_data(strava_data, table):
@@ -20,11 +20,11 @@ def save_data(strava_data, table):
         print("Error occurred while storing data in PostgresSQL:", str(e))
 
 
-def connect_database(database_name, user, password):
+def connect_database(host, port, database_name, user, password):
     try:
         # Create a new client and connect to the server
-        conn = psycopg2.connect(host="localhost",
-                                port="5432",
+        conn = psycopg2.connect(host=host,
+                                port=port,
                                 database=database_name,
                                 user=user,
                                 password=password)
@@ -35,20 +35,20 @@ def connect_database(database_name, user, password):
         print(e)
 
 
-db_name = configs.get("db-name").data
-db_user = configs.get("db-user").data
-db_password = configs.get("db-pass").data
+db_host = src.config.LoadProperties.configs.get("db-host").data
+db_port = src.config.LoadProperties.configs.get("db-port").data
+db_name = src.config.LoadProperties.configs.get("db-name").data
+db_user = src.config.LoadProperties.configs.get("db-user").data
+db_password = src.config.LoadProperties.configs.get("db-pass").data
 
-hr_power_db_conn = connect_database(db_name,
-                                    db_user,
-                                    db_password)
+hr_power_db_conn = connect_database(db_host, db_port, db_name, db_user, db_password)
 
 # Create a SQLAlchemy engine using your database connection details
 sql_alchemy_engine = create_engine('postgresql://' + db_user + ':' + db_password + '@localhost:5432/' + db_name)
 
 
 def get_athletic_data():
-    return pd.read_sql(configs.get("athletic-record-query").data, sql_alchemy_engine)
+    return pd.read_sql(src.config.LoadProperties.configs.get("athletic-record-query").data, sql_alchemy_engine)
 
 
 with open('../resources/DBSchemaQueries.sql', 'r') as sql_file:

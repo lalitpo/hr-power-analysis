@@ -57,10 +57,15 @@ athleticData = readtable(relativePath, opts);
 %% Clear temporary variables
 clear opts
 
+
+
 % Extracting data for a specific activity
 activityId = 8752058834
 timeDuration = 3600;
 testData = getTestData(athleticData, activityId, timeDuration)
+
+plot(testData,["heartrate" "power"])
+legend
 
 hr0_ivp = 75;
 hrt_ivp = 55;
