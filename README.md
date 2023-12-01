@@ -126,10 +126,10 @@ Don't forget to give the project a star! Thanks again!
 
 ## Contact
 ### Programmer :
-Lalit Poddar - [lalit.dar4@gmail.com](mailto:lalit.dar4@gmail.com)
+[Lalit Poddar](https://www.linkedin.com/in/lalit-poddar/)
 
 ### Supervision :
-Dr. Dietmar Saupe - [dietmar.saupe@uni-konstanz.de](mailto:dietmar.saupe@uni-konstanz.de)
+[Prof. Dr. Dietmar Saupe](https://www.mmsp.uni-konstanz.de/people/overview/prof-dr-dietmar-saupe/)
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ## Acknowledgments
