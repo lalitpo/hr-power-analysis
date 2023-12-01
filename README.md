@@ -2,22 +2,15 @@
   
 [![LinkedIn][linkedin-shield]][linkedin-url]
 
-
-
-<!-- PROJECT LOGO -->
 <br />
-<div align="center"> 
-
+<div align="center">
   <h3 align="center">HR-Power-Analysis</h3>
-
   <p align="center">
     Analyse Heart Rate and Power Output in endurance activities.
     <br />
-    .
     <a href="https://github.com/lalitpo/hr-power-analysis/issues">Report Bug</a> 
   </p>
 </div>
-
 
 
 <!-- TABLE OF CONTENTS -->
@@ -48,19 +41,34 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
- 
-This project is to assess and analyse the variation in heart rate and power output of professional cyclist in long distance endurance activities.
+Heart rate and power output are two important performance metrics which are used in the world of endurance sports, especially in cycling.
+
+This project focuses on developing and modeling the relationship between heart rate with varying power output.
+
+For this study, we took below steps:
+
+1. Data Extraction : We used web-scraping methodologies to scrap data from one of the 
+    popular physical exercise tracking app called [Strava](https://www.strava.com).
+
+
+2. Data Pre-Processing : This  step includes cleaning, manipulating, dropping, 
+    transforming and replacing missing data with different methods like Data Profiling, Linear Interpolation, etc.
+
+
+3. Modeling : This includes applying [Least Squares Approximation](https://de.mathworks.com/help/matlab/ref/lsqr.html) method, and [fmincon](https://de.mathworks.com/help/optim/ug/fmincon.html) in MATLAB
+    to estimate the coefficients of first order differential equation.
+
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 
 ### Built With
+[![My Skills](https://skillicons.dev/icons?i=python)](https://www.python.org/)
+[![My Skills](https://skillicons.dev/icons?i=r)](https://www.r-project.org/)
+[![My Skills](https://skillicons.dev/icons?i=matlab)](https://www.mathworks.com/products/matlab.html)
 
-* [![Python][Python]][python-url]
-* [![R][R]][R-url]
-* [![Matlab](https://play-lh.googleusercontent.com/UB0D2bAS6M4gGtaXPbhD8zK6bRrw_KkTeNMuZ_fkx32WC_OPPeQcKmH7AiID41xDc2k=w480-h960 = 250x250)][matlab-url]
-
+ 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
