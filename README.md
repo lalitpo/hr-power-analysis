@@ -3,10 +3,10 @@
 [![LinkedIn][linkedin-shield]][linkedin-url]
 
 <br />
-<div align="center">
+<div style="text-align: center;">
   <h3 align="center">HR-Power-Analysis</h3>
   <p align="center">
-    Analyse Heart Rate and Power Output in endurance activities.
+    Estimation of Heart Rate to varying power output in endurance activities.
     <br />
     <a href="https://github.com/lalitpo/hr-power-analysis/issues">Report Bug</a> 
   </p>
@@ -19,10 +19,8 @@
   <ol>
     <li>
       <a href="#about-the-project">About The Project</a>
-      <ul>
-        <li><a href="#built-with">Built With</a></li>
-      </ul>
     </li>
+    <li><a href="#built-with">Built With</a></li>
     <li>
       <a href="#getting-started">Getting Started</a>
       <ul>
@@ -30,7 +28,6 @@
         <li><a href="#installation">Installation</a></li>
       </ul>
     </li>
-    <li><a href="#usage">Usage</a></li>
     <li><a href="#contact">Contact</a></li>
     <li><a href="#acknowledgments">Acknowledgments</a></li>
   </ol>
@@ -63,66 +60,55 @@ For this study, we took below steps:
 
 
 
-### Built With
+## Built With
+
+
 [![My Skills](https://skillicons.dev/icons?i=python)](https://www.python.org/)
 [![My Skills](https://skillicons.dev/icons?i=r)](https://www.r-project.org/)
 [![My Skills](https://skillicons.dev/icons?i=matlab)](https://www.mathworks.com/products/matlab.html)
+[![My Skills](https://skillicons.dev/icons?i=postgres)](https://www.postgresql.org/)
 
- 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 
-<!-- GETTING STARTED 
 ## Getting Started
-
-This is an example of how you may give instructions on setting up your project locally.
-To get a local copy up and running follow these simple example steps.
+To correctly import and run this project locally, please follow below guidelines and instructions for smooth development process.
 
 ### Prerequisites
+As mentioned above in the "Built with" section, please have Python and R installed on your system.
+You can use [homebrew](https://brew.sh) or straightforward Installation for both [Python](https://www.python.org/) and [R](https://www.r-project.org/) as mentioned on their homepage.
 
-This is an example of how to list things you need to use the software and how to install them.
-* npm
-  ```sh
-  npm install npm@latest -g
-  ```
+MATLAB comes with its own tool called [MATLAB](https://matlab.mathworks.com) which needs to be a licensed version.
+You can have it for free if you're registered with a University or your workplace has its licensed copy.
+
+Python and R can be run and programmed on any IDE like [IntelliJ](https://www.jetbrains.com/idea/), [PyCharm](https://www.jetbrains.com/pycharm/), [VsCode](https://code.visualstudio.com), etc.
 
 ### Installation
 
-_Below is an example of how you can instruct your audience on installing and setting up your app. This template doesn't rely on any external dependencies or services._
+Below is an example of how you can set up the project on your local machine.
 
-1. Get a free API Key at [https://example.com](https://example.com)
-2. Clone the repo
-   ```sh
-   git clone https://github.com/your_username_/Project-Name.git
-   ```
-3. Install NPM packages
-   ```sh
-   npm install
-   ```
-4. Enter your API in `config.js`
-   ```js
-   const API_KEY = 'ENTER YOUR API'; 
-   ```
+1. For python packages and libraries, refer to the requirements.txt to install all the required packages. 
+
+    Note : psycopg2 is required to connect to the PostgreSQL database. However, psycopg2 is not available anymore and you will find compile time error.
+    Please install psycopg2-binary instead using pip/pip3 command. 
+
+    ```
+    pip3 install psycopg2-binary
+    ```
+
+2. Install [PostgreSQL](https://www.postgresql.org) on your machine for the database. You don't need an altogether a different UI to run queries because your IDE(IntelliJ, VsCode, etc.) will directly give you plugins to access them directly from the IDE.
+    However, in case, you want a separate UI for it, use [pgAdmin](https://www.pgadmin.org)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
-
-<!-- USAGE EXAMPLES 
-## Usage
-
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
-
-_For more examples, please refer to the [Documentation](https://example.com)_ -->
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+ 
 
 
 
-<!-- CONTRIBUTING
-## Contributing
+## Contributions
 
 Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
 
@@ -130,25 +116,22 @@ If you have a suggestion that would make this better, please fork the repo and c
 Don't forget to give the project a star! Thanks again!
 
 1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+2. Create your Feature Branch (`git checkout -b feature/feature-name`)
 3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
- -->
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
-<!-- CONTACT -->
+
+
 ## Contact
+### Programmer :
+Lalit Poddar - [lalit.dar4@gmail.com](mailto:lalit.dar4@gmail.com)
 
-Lalit Poddar - lalit-kumar.poddar@uni-konstanz.de
-
-Project Link: [https://github.com/lalitpo/hr-power-analysis](https://github.com/lalitpo/hr-power-analysis)
-
+### Supervision :
+Dr. Dietmar Saupe - [dietmar.saupe@uni-konstanz.de](mailto:dietmar.saupe@uni-konstanz.de)
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-
-
-<!-- ACKNOWLEDGMENTS -->
 ## Acknowledgments
 
 This project is developed under the guidance and support of Prof. Dr. Dietmar Saupe, Department of Computer and Information Science, University of Konstanz, Germany.
