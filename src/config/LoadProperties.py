@@ -1,27 +1,28 @@
 import datetime
 
+from colorama import Fore
 from jproperties import Properties
 
 configs = Properties()
 
 with open('../resources/strava-config.properties', 'rb') as strava_config:
     configs.load(strava_config)
-    print("Strava properties loaded.")
+    print(Fore.GREEN + "Strava properties loaded.")
 
 with open('../resources/db-config.properties', 'rb') as db_config:
     configs.load(db_config)
-    print("Database connection properties loaded.")
-
+    print(Fore.GREEN + "Database connection properties loaded.")
 
 with open('../resources/application-config.properties', 'rb') as app_config:
     configs.load(app_config)
-    print("Application properties loaded.")
+    print(Fore.GREEN + "Application properties loaded.")
 
 with open('../resources/DBSchemaQueries.sql', 'r') as db_schema_file:
     sql_queries_list = db_schema_file.read().split(';')
 
 minimum_activity_length = int(configs.get("min-activity-length-in-sec").data)
 strava_url = configs.get("strava-url").data
+
 
 def set_data_period():
     data_collection_period = int(configs.get("data-collection-period-in-weeks").data)

@@ -28,14 +28,14 @@ def connect_database(host, port, database_name, user, password):
                                 database=database_name,
                                 user=user,
                                 password=password)
-        print("You are successfully connected to your Database!")
+        print(Fore.GREEN + "You are successfully connected to" + database_name + "database!")
         conn.set_isolation_level(extensions.ISOLATION_LEVEL_AUTOCOMMIT)
         for sql_query in sql_queries_list:
             try:
                 hr_power_db_conn.cursor().execute(sql_query)
-                print("DB Schema Query executed successfully")
+                print(Fore.GREEN + "DB Schema created successfully")
             except OperationalError as msg:
-                print("Sql Query skipped: ", msg)
+                print(Fore.RED + "Sql Query skipped: ", msg)
         return conn
     except Exception as e:
         print(e)

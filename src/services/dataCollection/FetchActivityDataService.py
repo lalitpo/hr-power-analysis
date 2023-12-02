@@ -6,6 +6,8 @@ import re
 
 from _datetime import datetime as dt
 
+from colorama import Fore
+
 from src.constants.PowerAndHRConstants import watts
 
 from src.config.LoadProperties import data_url_suffix
@@ -112,5 +114,5 @@ def get_activity_data(activities_list):
                                  "elevation": '0' if elev == '' else elev}
                 activity_data.update(activity_info)
         except Exception as e:
-            print("Error occurred while saving activity data:", str(e), act)
+            print(Fore.RED + "Error occurred while saving activity data:", str(e), act)
     return activity_data
