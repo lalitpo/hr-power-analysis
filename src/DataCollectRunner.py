@@ -1,3 +1,5 @@
+from colorama import Fore
+
 from src.constants.PowerAndHRConstants import athlete_name
 from src.services.dataCollection.FetchActivityDataService import get_athlete_info, get_activity_ids, get_activity_data
 from src.services.dataCollection.LoginStravaService import login_strava
@@ -27,4 +29,4 @@ def store_in_db(bio, data):
 for athlete_id in athlete_ids:
     athlete_bio, activities_data = pull_data(athlete_id)
     store_in_db(athlete_bio, activities_data)
-    print("Data stored for athlete :" + athlete_bio[athlete_name])
+    print(Fore.GREEN + "Data stored for athlete :" + athlete_bio[athlete_name])

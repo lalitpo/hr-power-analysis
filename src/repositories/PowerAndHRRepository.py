@@ -17,7 +17,17 @@ def save_data(strava_data, table):
         hr_power_db_conn.commit()
     except Exception as e:
         # Handle the error
-        print("Error occurred while storing data in PostgresSQL:", str(e))
+        print(Fore.RED + "Error occurred while storing data in PostgresSQL:", str(e))
+
+
+def create_schema(conn):
+    for sql_query in sql_queries_list:
+        try:
+            conn.cursor().execute(sql_query)
+            conn.commit()
+        except OperationalError as msg:
+            print(Fore.RED + "DB Schema creation failed: ", msg)
+    print(Fore.GREEN + "DB Schema created successfully")
 
 
 def connect_database(host, port, database_name, user, password):
@@ -28,17 +38,12 @@ def connect_database(host, port, database_name, user, password):
                                 database=database_name,
                                 user=user,
                                 password=password)
-        print(Fore.GREEN + "You are successfully connected to" + database_name + "database!")
+        print(Fore.GREEN + "You are successfully connected to " + database_name + " database!")
         conn.set_isolation_level(extensions.ISOLATION_LEVEL_AUTOCOMMIT)
-        for sql_query in sql_queries_list:
-            try:
-                hr_power_db_conn.cursor().execute(sql_query)
-                print(Fore.GREEN + "DB Schema created successfully")
-            except OperationalError as msg:
-                print(Fore.RED + "Sql Query skipped: ", msg)
+        create_schema(conn)
         return conn
     except Exception as e:
-        print(e)
+        print(Fore.RED + "Database could not be connected : ", e)
 
 
 db_host = configs.get("db-host").data

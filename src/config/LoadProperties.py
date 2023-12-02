@@ -18,7 +18,7 @@ with open('../resources/application-config.properties', 'rb') as app_config:
     print(Fore.GREEN + "Application properties loaded.")
 
 with open('../resources/DBSchemaQueries.sql', 'r') as db_schema_file:
-    sql_queries_list = db_schema_file.read().split(';')
+    sql_queries_list = list(filter(None, db_schema_file.read().split(';')))
 
 minimum_activity_length = int(configs.get("min-activity-length-in-sec").data)
 strava_url = configs.get("strava-url").data

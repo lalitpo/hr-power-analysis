@@ -5,16 +5,13 @@ import time
 import re
 
 from _datetime import datetime as dt
-
 from colorama import Fore
-
-from src.constants.PowerAndHRConstants import watts
-
-from src.config.LoadProperties import data_url_suffix
 from bs4 import BeautifulSoup
 from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
 
+from src.constants.PowerAndHRConstants import watts
+from src.config.LoadProperties import data_url_suffix
 from src.config.LoadProperties import configs, data_period_list, strava_url
 from src.services.dataCollection.LoginStravaService import browser_driver
 from src.constants.PowerAndHRConstants import (athlete_id, entity, rowData, activities,
@@ -55,7 +52,7 @@ def get_activity_ids(ath_id):
                     activity_ids_list.append(act[activity][id])
         return list(set(activity_ids_list))
     except Exception as e:
-        print("Error occurred while getting activity ids:", str(e))
+        print(Fore.RED + "Error occurred while getting activity ids:", str(e))
 
 
 def get_athlete_info(athl_id):
@@ -66,12 +63,12 @@ def get_athlete_info(athl_id):
     try:
         athlete_location = browser_driver.find_element(By.CSS_SELECTOR, "div.location").text
     except NoSuchElementException:
-        print("Location not present for athlete :" + ath_name + "athlete_id" + athl_id)
+        print(Fore.RED + "Location not present for athlete :" + ath_name + "athlete_id" + athl_id)
 
     athlete_details = {"athlete_name": ath_name,
                        "athlete_id": athl_id,
                        "location": athlete_location}
-    print(athlete_details)
+    print(Fore.LIGHTWHITE_EX + "Athlete details : ", athlete_details)
     return athlete_details
 
 

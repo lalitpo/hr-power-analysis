@@ -20,7 +20,7 @@ browser_driver = webdriver.Chrome(options, service=ChromeService(ChromeDriverMan
 
 def login_strava():
     try:
-        print("Attempting to login to Strava.")
+        print(Fore.LIGHTWHITE_EX + "Attempting to login to Strava.")
         browser_driver.get(configs.get("strava-login-url").data)
         username = browser_driver.find_element(By.ID, "email")
         password = browser_driver.find_element(By.ID, "password")
