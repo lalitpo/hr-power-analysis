@@ -83,7 +83,7 @@ You can use [homebrew](https://brew.sh) or straightforward Installation for both
 MATLAB comes with its own tool called [MATLAB](https://matlab.mathworks.com) which needs to be a licensed version.
 You can have it for free if you're registered with a University or your workplace has its licensed copy.
 
-Python and R can be run and programmed on any IDE like [IntelliJ](https://www.jetbrains.com/idea/), [PyCharm](https://www.jetbrains.com/pycharm/), [VsCode](https://code.visualstudio.com), etc.
+Python and R can be run and programmed on any IDE like [IntelliJ](https://www.jetbrains.com/idea/), [PyCharm](https://www.jetbrains.com/pycharm/), [VS Code](https://code.visualstudio.com), etc.
 
 ### Installation
 
@@ -98,7 +98,7 @@ Below is an example of how you can set up the project on your local machine.
     pip3 install psycopg2-binary
     ```
 
-2. Install [PostgreSQL](https://www.postgresql.org) on your machine for the database. You don't need an altogether a different UI to run queries because your IDE(IntelliJ, VsCode, etc.) will directly give you plugins to access them directly from the IDE.
+2. Install [PostgreSQL](https://www.postgresql.org) on your machine for the database. You don't need an altogether a different UI to run queries because your IDE(IntelliJ, VS Code, etc.) will directly give you plugins to access them directly from the IDE.
     However, in case, you want a separate UI for it, use [pgAdmin](https://www.pgadmin.org)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
