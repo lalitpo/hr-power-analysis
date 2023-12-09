@@ -4,7 +4,7 @@
 
 <br />
 <div style="text-align: center;">
-  <h3 align="center">HR-Power-Analysis</h3>
+  <h3 align="center">HR-Power-Relation-Modelling</h3>
   <p align="center">
     Estimation of Heart Rate to varying power output in endurance activities.
     <br />
