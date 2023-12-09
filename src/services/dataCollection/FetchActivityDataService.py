@@ -10,7 +10,7 @@ from bs4 import BeautifulSoup
 from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
 
-from src.constants.PowerAndHRConstants import watts
+from src.constants.PowerAndHRConstants import watts, activity_id
 from src.config.LoadProperties import data_url_suffix
 from src.config.LoadProperties import configs, data_period_list, strava_url
 from src.services.dataCollection.LoginStravaService import browser_driver
@@ -45,11 +45,11 @@ def get_activity_ids(ath_id):
             attribute_list = BeautifulSoup(div_element, html_parser).contents[0].__getattribute__("attrs")
             activity_list = json.loads(attribute_list["data-react-props"])['appContext']['preFetchedEntries']
 
-            for act in activity_list:
+            for act in activity_list:  # Convert minutes and seconds to seconds
                 if act[entity] == "GroupActivity" and act[rowData][activities][0][activity_type] == ride:
-                    activity_ids_list.append(str(act[rowData][activities][0][entity + '_' + id]))
+                        activity_ids_list.append(str(act[rowData][activities][0][entity + '_' + activity_id]))
                 elif act[entity] == "Activity" and act[activity][activity_type] == ride:
-                    activity_ids_list.append(act[activity][id])
+                    activity_ids_list.append(act[activity][activity_id])
         return list(set(activity_ids_list))
     except Exception as e:
         print(Fore.RED + "Error occurred while getting activity ids:", str(e))
@@ -72,8 +72,8 @@ def get_athlete_info(athl_id):
     return athlete_details
 
 
-def get_activity_data(activities_list):
-    activity_data = []
+def get_activities_data(activities_list):
+    activities_data = []
     for act in activities_list:
         try:
             time.sleep(5)  # latency so that strava doesn't block us for scraping.
@@ -88,7 +88,7 @@ def get_activity_data(activities_list):
             main_stats_list = BeautifulSoup(main_stats_div, html_parser).contents[0].__getattribute__("contents")
             head_data = re.split(r'\n+', main_stats_list[1].text)
             time.sleep(5)  # latency so that strava doesn't block us for scraping.
-            browser_driver.get(data_url_suffix.replace(activity + '_' + id, act))
+            browser_driver.get(data_url_suffix.replace(activity + '_' + activity_id, act))
             pre = browser_driver.find_element(By.TAG_NAME, "pre").text
             activity_info = json.loads(pre)
             if 's' in head_data[3]:
@@ -104,12 +104,13 @@ def get_activity_data(activities_list):
                                                            seconds=int(activity_duration_split[2]))
             if watts in activity_info:
                 elev = head_data[5].replace(',', '').split(' ')[0]
-                activity_data = {activity + '_' + id: act.strip(),
-                                 "activity_date": dt.strptime(activity_meta_data[1].split(', ')[1], '%d %B %Y').date(),
-                                 "activity_distance": head_data[1].split(' ')[0],
-                                 "activity_duration": str(activity_duration),
-                                 "elevation": '0' if elev == '' else elev}
-                activity_data.update(activity_info)
+                activity_info.update({activity + '_' + activity_id: act.strip(),
+                                      "activity_date": dt.strptime(activity_meta_data[1].split(', ')[1],
+                                                                   '%d %B %Y').date(),
+                                      "activity_distance": head_data[1].split(' ')[0],
+                                      "activity_duration": str(activity_duration),
+                                      "elevation": '0' if elev == '' else elev})
+                activities_data.append(activity_info)
         except Exception as e:
             print(Fore.RED + "Error occurred while saving activity data:", str(e), act)
-    return activity_data
+    return activities_data

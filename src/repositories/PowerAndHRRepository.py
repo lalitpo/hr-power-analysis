@@ -6,7 +6,7 @@ from sqlalchemy import create_engine
 from src.config.LoadProperties import *
 
 
-def save_data(strava_data, table):
+def save_profile_data(strava_data, table):
     keys = strava_data.keys()
     values = strava_data.values()
     columns = ', '.join(keys)
@@ -18,6 +18,21 @@ def save_data(strava_data, table):
     except Exception as e:
         # Handle the error
         print(Fore.RED + "Error occurred while storing data in PostgresSQL:", str(e))
+
+
+def save_activity_data(strava_data, table):
+    for data in strava_data:
+        keys = data.keys()
+        values = data.values()
+        columns = ', '.join(keys)
+        value_placeholders = ', '.join(['%s'] * len(keys))
+        sql = f'INSERT INTO public."{table}" ({columns}) VALUES ({value_placeholders})'
+        try:
+            hr_power_db_conn.cursor().execute(sql, tuple(values))
+            hr_power_db_conn.commit()
+        except Exception as e:
+            # Handle the error
+            print(Fore.RED + "Error occurred while storing data in PostgreSQL:", str(e))
 
 
 def create_schema(conn):

@@ -9,5 +9,5 @@ activity = 'activity'
 entity = 'entity'
 location = "location"
 activity_type = 'type'
-id = 'id'
+activity_id = 'id'
 html_parser = "html.parser"
