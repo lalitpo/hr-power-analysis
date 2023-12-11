@@ -1,4 +1,5 @@
 import datetime
+import os
 
 from colorama import Fore
 from jproperties import Properties
@@ -20,9 +21,13 @@ with open('../resources/application-config.properties', 'rb') as app_config:
 with open('../resources/DBSchemaQueries.sql', 'r') as db_schema_file:
     sql_queries_list = list(filter(None, db_schema_file.read().split(';')))
 
-minimum_activity_length = int(configs.get("min-activity-length-in-sec").data)
 strava_url = configs.get("strava-url").data
+imp_params = configs.get("params").data.split(",")
 
+# Create a common folder "Strava Data"
+data_folder = "Strava Data"
+if not os.path.exists("../" + data_folder):
+    os.makedirs("../" + data_folder)
 
 def set_data_period():
     data_collection_period = int(configs.get("data-collection-period-in-weeks").data)
