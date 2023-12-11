@@ -1,14 +1,29 @@
 import pandas as pd
 import psycopg2
+from colorama import Fore
 from psycopg2 import extensions, OperationalError
 from sqlalchemy import create_engine
 
-from src.config.LoadProperties import *
+from src.config.LoadProperties import sql_queries_list, configs
+
+"""
+Saves a record in the specified table.
+
+Parameters:
+    data (dict): A dictionary containing the data to be saved.
+    table (str): The name of the table where the record should be saved.
+
+Returns:
+    None
+
+Raises:
+    Exception: If an error occurs while storing the data in PostgresSQL.
+"""
 
 
-def save_profile_data(strava_data, table):
-    keys = strava_data.keys()
-    values = strava_data.values()
+def save_record(data, table):
+    keys = data.keys()
+    values = data.values()
     columns = ', '.join(keys)
     value_placeholders = ', '.join(['%s'] * len(keys))
     sql = f'INSERT INTO public."{table}" ({columns}) VALUES ({value_placeholders})'
@@ -17,22 +32,25 @@ def save_profile_data(strava_data, table):
         hr_power_db_conn.commit()
     except Exception as e:
         # Handle the error
-        print(Fore.RED + "Error occurred while storing data in PostgresSQL:", str(e))
+        print(Fore.RED + "Error occurred while storing data in " + table + " in PostgresSQL:", str(e))
 
 
-def save_activity_data(strava_data, table):
-    for data in strava_data:
-        keys = data.keys()
-        values = data.values()
-        columns = ', '.join(keys)
-        value_placeholders = ', '.join(['%s'] * len(keys))
-        sql = f'INSERT INTO public."{table}" ({columns}) VALUES ({value_placeholders})'
-        try:
-            hr_power_db_conn.cursor().execute(sql, tuple(values))
-            hr_power_db_conn.commit()
-        except Exception as e:
-            # Handle the error
-            print(Fore.RED + "Error occurred while storing data in PostgreSQL:", str(e))
+"""
+    Executes a list of SQL queries to create a database schema.
+
+    Args:
+        conn (connection): The database connection object.
+
+    Returns:
+        None
+
+    Raises:
+        OperationalError: If any of the SQL queries fail to execute.
+
+    Prints:
+        "DB Schema creation failed: <error message>" if any query fails.
+        "DB Schema created successfully" if all queries are executed successfully.
+"""
 
 
 def create_schema(conn):
@@ -45,6 +63,22 @@ def create_schema(conn):
     print(Fore.GREEN + "DB Schema created successfully")
 
 
+"""
+Connects to a PostgreSQL database using the provided connection parameters.
+
+Args:
+    host (str): The hostname or IP address of the server.
+    port (int): The port number on which the server is listening.
+    database_name (str): The name of the database to connect to.
+    user (str): The username for authentication.
+    password (str): The password for authentication.
+
+Returns:
+    psycopg2.extensions.connection: The connection object if the connection is successful.
+
+Raises:
+    Exception: If the connection to the database fails.
+"""
 def connect_database(host, port, database_name, user, password):
     try:
         # Create a new client and connect to the server
@@ -72,6 +106,10 @@ hr_power_db_conn = connect_database(db_host, db_port, db_name, db_user, db_passw
 # Create a SQL engine using your database connection details
 sql_engine = create_engine('postgresql://' + db_user + ':' + db_password + '@localhost:5432/' + db_name)
 
+"""
+Read and return athletic data from a SQL database.
 
+:return: A pandas DataFrame containing the athletic data.
+"""
 def get_athletic_data():
     return pd.read_sql(configs.get("athletic-record-query").data, sql_engine)
