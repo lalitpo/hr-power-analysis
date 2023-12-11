@@ -1,23 +1,28 @@
-import urllib.parse
 import datetime
 import json
-import time
 import re
-
+import time
+import urllib.parse
 from _datetime import datetime as dt
-from colorama import Fore
+
 from bs4 import BeautifulSoup
+from colorama import Fore
 from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
 
-from src.constants.PowerAndHRConstants import watts, activity_id
-from src.config.LoadProperties import data_url_suffix
 from src.config.LoadProperties import configs, data_period_list, strava_url
-from src.services.dataCollection.LoginStravaService import browser_driver
+from src.config.LoadProperties import data_url_suffix, imp_params
+from src.constants.PowerAndHRConstants import activity_id
 from src.constants.PowerAndHRConstants import (athlete_id, entity, rowData, activities,
                                                activity_type, ride, activity, html_parser)
+from src.services.dataCollection.LoginStravaService import browser_driver
 
+"""
+Generate a list of weekly activity URLs.
 
+Returns:
+    activity_url_list (list): A list of URLs for weekly activities.
+"""
 def get_weekly_urls():
     base_url = strava_url + "/pros/athlete_id#interval?"
     interval_param = configs.get("activity-interval").data.split(",")
@@ -30,12 +35,22 @@ def get_weekly_urls():
     return activity_url_list
 
 
+"""
+    Retrieves a list of activity IDs associated with a given athlete ID.
+
+    Parameters:
+        ath_id (int): The ID of the athlete.
+
+    Returns:
+        list: A list of unique activity IDs.
+"""
 def get_activity_ids(ath_id):
     weekly_urls = get_weekly_urls()
     try:
         activity_ids_list = []
         for week_url in weekly_urls:
             week_url = week_url.replace(athlete_id, ath_id)
+            print(Fore.LIGHTWHITE_EX + "Collecting activity ids of: " + week_url)
             browser_driver.get(week_url)
             time.sleep(5)
             div_element = browser_driver.find_element(By.CSS_SELECTOR,
@@ -47,7 +62,7 @@ def get_activity_ids(ath_id):
 
             for act in activity_list:  # Convert minutes and seconds to seconds
                 if act[entity] == "GroupActivity" and act[rowData][activities][0][activity_type] == ride:
-                        activity_ids_list.append(str(act[rowData][activities][0][entity + '_' + activity_id]))
+                    activity_ids_list.append(str(act[rowData][activities][0][entity + '_' + activity_id]))
                 elif act[entity] == "Activity" and act[activity][activity_type] == ride:
                     activity_ids_list.append(act[activity][activity_id])
         return list(set(activity_ids_list))
@@ -55,6 +70,18 @@ def get_activity_ids(ath_id):
         print(Fore.RED + "Error occurred while getting activity ids:", str(e))
 
 
+"""
+    Retrieves information about an athlete based on their athlete ID.
+
+    Args:
+        athl_id (int): The ID of the athlete.
+
+    Returns:
+        dict: A dictionary containing the athlete's name, ID, and location information.
+
+    Raises:
+        NoSuchElementException: If the athlete's location is not found.
+"""
 def get_athlete_info(athl_id):
     athlete_url = strava_url + "/pros/" + athl_id
     browser_driver.get(athlete_url)
@@ -63,7 +90,7 @@ def get_athlete_info(athl_id):
     try:
         athlete_location = browser_driver.find_element(By.CSS_SELECTOR, "div.location").text
     except NoSuchElementException:
-        print(Fore.RED + "Location not present for athlete :" + ath_name + "athlete_id" + athl_id)
+        print(Fore.RED + "Location not present for athlete : " + ath_name + ", and athlete_id : " + athl_id)
 
     athlete_details = {"athlete_name": ath_name,
                        "athlete_id": athl_id,
@@ -72,10 +99,66 @@ def get_athlete_info(athl_id):
     return athlete_details
 
 
+"""
+    Checks if the specified parameters exist in the given activity information.
+
+    Parameters:
+        activity_info (dict): A dictionary containing information about an activity.
+
+    Returns:
+        bool: True if both parameters exist and have non-zero length values, False otherwise.
+"""
+def param_exists(activity_info):
+    return (
+            imp_params[0] in activity_info
+            and len(activity_info[imp_params[0]]) != 0
+            and imp_params[1] in activity_info
+            and len(activity_info[imp_params[1]]) != 0
+    )
+
+
+"""
+    Calculate the duration of an activity based on the provided head data.
+
+    Parameters:
+        head_data (list): A list containing information about the activity. The 
+                          third element of the list represents the duration of 
+                          the activity.
+
+    Returns:
+        datetime.timedelta: The duration of the activity as a timedelta object.
+"""
+def calc_activity_duration(head_data):
+    if 's' in head_data[3]:
+        duration = "00:00" + head_data[3][:-1]
+    else:
+        duration_split = head_data[3].split(':')
+        if len(duration_split) == 2:
+            duration = datetime.timedelta(minutes=int(duration_split[0]),
+                                          seconds=int(duration_split[1]))
+        else:
+            duration = datetime.timedelta(hours=int(duration_split[0]),
+                                          minutes=int(duration_split[1]),
+                                          seconds=int(duration_split[2]))
+    return duration
+
+
+"""
+    Retrieves data for each activity in the given activities list.
+    
+    Parameters:
+        activities_list (list): A list of activity IDs.
+    
+    Returns:
+        list: A list of activity data dictionaries.
+"""
 def get_activities_data(activities_list):
     activities_data = []
     for act in activities_list:
         try:
+            print(Fore.LIGHTWHITE_EX + "Fetching Data for activity ID :  " + act)
+            if act == '9886837647':
+                print("pause")
             time.sleep(5)  # latency so that strava doesn't block us for scraping.
             browser_driver.get(strava_url + "/activities/" + act)
             activity_summary = browser_driver.find_element(By.CSS_SELECTOR, "div.details").get_attribute(
@@ -91,18 +174,9 @@ def get_activities_data(activities_list):
             browser_driver.get(data_url_suffix.replace(activity + '_' + activity_id, act))
             pre = browser_driver.find_element(By.TAG_NAME, "pre").text
             activity_info = json.loads(pre)
-            if 's' in head_data[3]:
-                activity_duration = "00:00" + head_data[3][:-1]
-            else:
-                activity_duration_split = head_data[3].split(':')
-                if len(activity_duration_split) == 2:
-                    activity_duration = datetime.timedelta(minutes=int(activity_duration_split[0]),
-                                                           seconds=int(activity_duration_split[1]))
-                else:
-                    activity_duration = datetime.timedelta(hours=int(activity_duration_split[0]),
-                                                           minutes=int(activity_duration_split[1]),
-                                                           seconds=int(activity_duration_split[2]))
-            if watts in activity_info:
+
+            if param_exists(activity_info):
+                activity_duration = calc_activity_duration(head_data)
                 elev = head_data[5].replace(',', '').split(' ')[0]
                 activity_info.update({activity + '_' + activity_id: act.strip(),
                                       "activity_date": dt.strptime(activity_meta_data[1].split(', ')[1],
@@ -111,6 +185,8 @@ def get_activities_data(activities_list):
                                       "activity_duration": str(activity_duration),
                                       "elevation": '0' if elev == '' else elev})
                 activities_data.append(activity_info)
+            else:
+                print(Fore.RED + "No data fetched for activity : " + act)
         except Exception as e:
-            print(Fore.RED + "Error occurred while saving activity data:", str(e), act)
+            print(Fore.RED + "Error occurred while fetching data for activity : ", str(e), act)
     return activities_data
