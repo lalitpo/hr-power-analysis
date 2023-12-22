@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS public."athlete-info"(
-athlete_id character varying COLLATE pg_catalog."default" NOT NULL,
-athlete_name text COLLATE pg_catalog."default" NOT NULL,
-location character varying COLLATE pg_catalog."default",
+                                                    athlete_id   bigint NOT NULL,
+                                                    athlete_name text   NOT NULL,
+                                                    location     text COLLATE pg_catalog."default",
 activities_ids bigint[] NOT NULL,
 CONSTRAINT "athlete-info_pkey" PRIMARY KEY (athlete_id));
 

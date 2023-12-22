@@ -1,10 +1,13 @@
+from datetime import datetime
+
 import pandas as pd
 import psycopg2
 from colorama import Fore
 from psycopg2 import extensions, OperationalError
+from psycopg2._psycopg import IntegrityError
 from sqlalchemy import create_engine
 
-from src.config.LoadProperties import sql_queries_list, configs
+from src.config.LoadProperties import sql_queries_list, configs, retrieve_data_sql
 
 """
 Saves a record in the specified table.
@@ -26,13 +29,25 @@ def save_record(data, table):
     values = data.values()
     columns = ', '.join(keys)
     value_placeholders = ', '.join(['%s'] * len(keys))
-    sql = f'INSERT INTO public."{table}" ({columns}) VALUES ({value_placeholders})'
+    insert_sql = f'INSERT INTO public."{table}" ({columns}) VALUES ({value_placeholders})'
     try:
-        hr_power_db_conn.cursor().execute(sql, tuple(values))
+        hr_power_db_conn.cursor().execute(insert_sql, tuple(values))
         hr_power_db_conn.commit()
+    except IntegrityError as e:
+        print(Fore.RED + (datetime.now()).strftime("%Y-%m-%d %H:%M:%S") +
+              " Error occurred while storing data in " + table + " in PostgresSQL:", str(e))
+        print(Fore.LIGHTWHITE_EX + (datetime.now()).strftime("%Y-%m-%d %H:%M:%S") +
+              " Updating the table " + table + " by adding new activity IDs to the existing record of athlete ID: ")
+        if table == "athlete-info":
+            update_sql = f'UPDATE public."{table}" SET activities_ids = activities_ids || %s::bigint[] WHERE athlete_id = %s'
+            hr_power_db_conn.cursor().execute(update_sql, (data['activities_ids'], data["athlete_id"]))
+            hr_power_db_conn.commit()
+        else:
+            print(Fore.LIGHTWHITE_EX + (datetime.now()).strftime("%Y-%m-%d %H:%M:%S") +
+                  " The table is : " + table + ". So check why there is duplicate entry in database for it already.")
     except Exception as e:
-        # Handle the error
-        print(Fore.RED + "Error occurred while storing data in " + table + " in PostgresSQL:", str(e))
+        print(Fore.RED + (datetime.now()).strftime(
+            "%Y-%m-%d %H:%M:%S") + " Error occurred while storing data in " + table + " in PostgresSQL:", str(e))
 
 
 """
@@ -59,8 +74,8 @@ def create_schema(conn):
             conn.cursor().execute(sql_query)
             conn.commit()
         except OperationalError as msg:
-            print(Fore.RED + "DB Schema creation failed: ", msg)
-    print(Fore.GREEN + "DB Schema created successfully")
+            print(Fore.RED + (datetime.now()).strftime("%Y-%m-%d %H:%M:%S") + " DB Schema creation failed: ", msg)
+    print(Fore.GREEN + (datetime.now()).strftime("%Y-%m-%d %H:%M:%S") + " DB Schema created successfully")
 
 
 """
@@ -87,12 +102,13 @@ def connect_database(host, port, database_name, user, password):
                                 database=database_name,
                                 user=user,
                                 password=password)
-        print(Fore.GREEN + "You are successfully connected to " + database_name + " database!")
+        print(Fore.GREEN + (datetime.now()).strftime(
+            "%Y-%m-%d %H:%M:%S") + " You are successfully connected to " + database_name + " database!")
         conn.set_isolation_level(extensions.ISOLATION_LEVEL_AUTOCOMMIT)
         create_schema(conn)
         return conn
     except Exception as e:
-        print(Fore.RED + "Database could not be connected : ", e)
+        print(Fore.RED + (datetime.now()).strftime("%Y-%m-%d %H:%M:%S") + " Database could not be connected : ", e)
 
 
 db_host = configs.get("db-host").data
@@ -112,4 +128,4 @@ Read and return athletic data from a SQL database.
 :return: A pandas DataFrame containing the athletic data.
 """
 def get_athletic_data():
-    return pd.read_sql(configs.get("athletic-record-query").data, sql_engine)
+    return pd.read_sql(retrieve_data_sql, sql_engine)

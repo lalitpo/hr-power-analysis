@@ -4,6 +4,7 @@ import re
 import time
 import urllib.parse
 from _datetime import datetime as dt
+from datetime import datetime as dtt
 
 from bs4 import BeautifulSoup
 from colorama import Fore
@@ -23,6 +24,8 @@ Generate a list of weekly activity URLs.
 Returns:
     activity_url_list (list): A list of URLs for weekly activities.
 """
+
+
 def get_weekly_urls():
     base_url = strava_url + "/pros/athlete_id#interval?"
     interval_param = configs.get("activity-interval").data.split(",")
@@ -44,15 +47,18 @@ def get_weekly_urls():
     Returns:
         list: A list of unique activity IDs.
 """
+
+
 def get_activity_ids(ath_id):
     weekly_urls = get_weekly_urls()
     try:
         activity_ids_list = []
         for week_url in weekly_urls:
             week_url = week_url.replace(athlete_id, ath_id)
-            print(Fore.LIGHTWHITE_EX + "Collecting activity ids of: " + week_url)
+            print(Fore.LIGHTWHITE_EX + (dtt.now()).strftime("%Y-%m-%d %H:%M:%S") + " Collecting activity ids "
+                                                                                   "of: " + week_url)
             browser_driver.get(week_url)
-            time.sleep(5)
+            time.sleep(10)
             div_element = browser_driver.find_element(By.CSS_SELECTOR,
                                                       "div.content.react-feed-component").get_attribute(
                 "outerHTML")
@@ -67,7 +73,8 @@ def get_activity_ids(ath_id):
                     activity_ids_list.append(act[activity][activity_id])
         return list(set(activity_ids_list))
     except Exception as e:
-        print(Fore.RED + "Error occurred while getting activity ids:", str(e))
+        print(Fore.RED + (dtt.now()).strftime("%Y-%m-%d %H:%M:%S") + " Error occurred while getting activity "
+                                                                     "ids:", str(e))
 
 
 """
@@ -82,6 +89,8 @@ def get_activity_ids(ath_id):
     Raises:
         NoSuchElementException: If the athlete's location is not found.
 """
+
+
 def get_athlete_info(athl_id):
     athlete_url = strava_url + "/pros/" + athl_id
     browser_driver.get(athlete_url)
@@ -90,12 +99,13 @@ def get_athlete_info(athl_id):
     try:
         athlete_location = browser_driver.find_element(By.CSS_SELECTOR, "div.location").text
     except NoSuchElementException:
-        print(Fore.RED + "Location not present for athlete : " + ath_name + ", and athlete_id : " + athl_id)
+        print(Fore.RED + (dtt.now()).strftime(
+            "%Y-%m-%d %H:%M:%S") + " Location not present for athlete : " + ath_name + ", and athlete_id : " + athl_id)
 
     athlete_details = {"athlete_name": ath_name,
                        "athlete_id": athl_id,
                        "location": athlete_location}
-    print(Fore.LIGHTWHITE_EX + "Athlete details : ", athlete_details)
+    print(Fore.LIGHTWHITE_EX + (dtt.now()).strftime("%Y-%m-%d %H:%M:%S") + " Athlete details : ", athlete_details)
     return athlete_details
 
 
@@ -108,6 +118,8 @@ def get_athlete_info(athl_id):
     Returns:
         bool: True if both parameters exist and have non-zero length values, False otherwise.
 """
+
+
 def param_exists(activity_info):
     return (
             imp_params[0] in activity_info
@@ -128,6 +140,8 @@ def param_exists(activity_info):
     Returns:
         datetime.timedelta: The duration of the activity as a timedelta object.
 """
+
+
 def calc_activity_duration(head_data):
     if 's' in head_data[3]:
         duration = "00:00" + head_data[3][:-1]
@@ -152,14 +166,15 @@ def calc_activity_duration(head_data):
     Returns:
         list: A list of activity data dictionaries.
 """
+
+
 def get_activities_data(activities_list):
     activities_data = []
     for act in activities_list:
         try:
-            print(Fore.LIGHTWHITE_EX + "Fetching Data for activity ID :  " + act)
-            if act == '9886837647':
-                print("pause")
-            time.sleep(5)  # latency so that strava doesn't block us for scraping.
+            print(Fore.LIGHTWHITE_EX + (dtt.now()).strftime("%Y-%m-%d %H:%M:%S") +
+                  " Fetching Data for activity ID : " + act)
+            time.sleep(10)  # latency so that strava doesn't block us for scraping.
             browser_driver.get(strava_url + "/activities/" + act)
             activity_summary = browser_driver.find_element(By.CSS_SELECTOR, "div.details").get_attribute(
                 "outerHTML")
@@ -170,7 +185,7 @@ def get_activities_data(activities_list):
                 "outerHTML")
             main_stats_list = BeautifulSoup(main_stats_div, html_parser).contents[0].__getattribute__("contents")
             head_data = re.split(r'\n+', main_stats_list[1].text)
-            time.sleep(5)  # latency so that strava doesn't block us for scraping.
+            time.sleep(10)  # latency so that strava doesn't block us for scraping.
             browser_driver.get(data_url_suffix.replace(activity + '_' + activity_id, act))
             pre = browser_driver.find_element(By.TAG_NAME, "pre").text
             activity_info = json.loads(pre)
@@ -186,7 +201,14 @@ def get_activities_data(activities_list):
                                       "elevation": '0' if elev == '' else elev})
                 activities_data.append(activity_info)
             else:
-                print(Fore.RED + "No data fetched for activity : " + act)
+                print(Fore.RED + (dtt.now()).strftime("%Y-%m-%d %H:%M:%S") + " No data fetched for activity "
+                                                                             "ID : " + act +
+                      ". It could be due to the activity was " +
+                      "did not record either of heartrate " +
+                      "or watts or both at all.")
         except Exception as e:
-            print(Fore.RED + "Error occurred while fetching data for activity : ", str(e), act)
+            print(Fore.RED + (dtt.now()).strftime("%Y-%m-%d %H:%M:%S") +
+                  " Error occurred while fetching data for "
+                  "activity : ", str(e), act)
+
     return activities_data

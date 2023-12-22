@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from colorama import Fore
 from selenium import webdriver
 from selenium.common import WebDriverException
@@ -20,13 +22,13 @@ browser_driver = webdriver.Chrome(options, service=ChromeService(ChromeDriverMan
 
 def login_strava():
     try:
-        print(Fore.LIGHTWHITE_EX + "Attempting to login to Strava.")
+        print(Fore.LIGHTWHITE_EX + (datetime.now()).strftime("%Y-%m-%d %H:%M:%S") + " Attempting to login to Strava.")
         browser_driver.get(configs.get("strava-login-url").data)
         username = browser_driver.find_element(By.ID, "email")
         password = browser_driver.find_element(By.ID, "password")
         username.send_keys(configs.get("strava-username").data)
         password.send_keys(configs.get("strava-password").data)
         browser_driver.find_element(By.ID, "login-button").click()
-        print(Fore.GREEN + "Logged in successfully to Strava.")
+        print(Fore.GREEN + (datetime.now()).strftime("%Y-%m-%d %H:%M:%S") + " Logged in successfully to Strava.")
     except WebDriverException as webex:
-        print(Fore.RED + "Login Failed : ", webex)
+        print(Fore.RED + (datetime.now()).strftime("%Y-%m-%d %H:%M:%S") + " Login Failed : ", webex)
