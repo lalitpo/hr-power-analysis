@@ -13,10 +13,9 @@ from selenium.webdriver.common.by import By
 
 from src.config.LoadProperties import configs, data_period_list, strava_url
 from src.config.LoadProperties import data_url_suffix, imp_params
-from src.constants.PowerAndHRConstants import activity_id
+from src.constants.PowerAndHRConstants import activity_id, power, average, maxx, speed, cadence, heart_rate
 from src.constants.PowerAndHRConstants import (athlete_id, entity, rowData, activities,
                                                activity_type, ride, activity, html_parser)
-from src.services.dataCollection.LoginStravaService import browser_driver
 
 """
 Generate a list of weekly activity URLs.
@@ -49,12 +48,12 @@ def get_weekly_urls():
 """
 
 
-def get_activity_ids(ath_id, week_url):
+def get_activity_ids(browser_driver, ath_id, week_url):
     try:
         activity_ids_list = []
         url = week_url.replace(athlete_id, ath_id)
         print(Fore.LIGHTWHITE_EX + (dtt.now()).strftime("%Y-%m-%d %H:%M:%S") + " Collecting activity ids "
-                                                                                   "of: " + url)
+                                                                               "of: " + url)
         browser_driver.get(url)
         time.sleep(10)
         div_element = browser_driver.find_element(By.CSS_SELECTOR, "div.content.react-feed-component").get_attribute(
@@ -88,7 +87,7 @@ def get_activity_ids(ath_id, week_url):
 """
 
 
-def get_athlete_info(athl_id):
+def get_athlete_info(browser_driver, athl_id):
     athlete_url = strava_url + "/pros/" + athl_id
     browser_driver.get(athlete_url)
     ath_name = browser_driver.find_element(By.CSS_SELECTOR, "h1.text-title1.athlete-name").text
@@ -165,7 +164,40 @@ def calc_activity_duration(head_data):
 """
 
 
-def get_activities_data(activities_list):
+def get_data(sub_type, type, stats_data):
+    if type == power:
+        if stats_data[3] == sub_type:
+            return ''.join([c for c in stats_data[15] if c.isdigit()])
+        if stats_data[4] == sub_type:
+            return ''.join([c for c in stats_data[16] if c.isdigit()])
+        if stats_data[2] == 'Weighted Avg Power':
+            return ''.join([c for c in stats_data[1] if c.isdigit()])
+        else:
+            return '0'
+    if type == speed:
+        if stats_data[3] == sub_type:
+            return ''.join([c if c.isdigit() or c == '.' else '' for c in stats_data[6]])
+        if stats_data[4] == sub_type:
+            return ''.join([c if c.isdigit() or c == '.' else '' for c in stats_data[7]])
+        else:
+            return '0'
+    if type == cadence:
+        if stats_data[3] == sub_type:
+            return ''.join([c for c in stats_data[12] if c.isdigit()])
+        if stats_data[4] == sub_type:
+            return ''.join([c for c in stats_data[13] if c.isdigit()])
+        else:
+            return '0'
+    if type == heart_rate:
+        if stats_data[3] == sub_type:
+            return ''.join([c for c in stats_data[9] if c.isdigit()])
+        if stats_data[4] == sub_type:
+            return ''.join([c for c in stats_data[10] if c.isdigit()])
+        else:
+            return '0'
+
+
+def get_activities_data(browser_driver, activities_list):
     activities_data = []
     for act in activities_list:
         try:
@@ -182,6 +214,8 @@ def get_activities_data(activities_list):
                 "outerHTML")
             main_stats_list = BeautifulSoup(main_stats_div, html_parser).contents[0].__getattribute__("contents")
             head_data = re.split(r'\n+', main_stats_list[1].text)
+            secondary_stats_data = re.split(r'\n+', main_stats_list[3].text)
+            more_stats_data = re.split(r'\n+', main_stats_list[5].text)
             time.sleep(10)  # latency so that strava doesn't block us for scraping.
             browser_driver.get(data_url_suffix.replace(activity + '_' + activity_id, act))
             pre = browser_driver.find_element(By.TAG_NAME, "pre").text
@@ -195,7 +229,17 @@ def get_activities_data(activities_list):
                                                                    '%d %B %Y').date(),
                                       "activity_distance": head_data[1].split(' ')[0],
                                       "activity_duration": str(activity_duration),
-                                      "elevation": '0' if elev == '' else elev})
+                                      "elevation": '0' if elev == '' else elev,
+                                      "average_power": get_data(average, power, more_stats_data),
+                                      "max_power": get_data(maxx, power, more_stats_data),
+                                      "weighted_average_power": get_data('Weighted', power, secondary_stats_data),
+                                      "average_speed": get_data(average, speed, more_stats_data),
+                                      "max_speed": get_data(maxx, speed, more_stats_data),
+                                      "average_cadence": get_data(average, cadence, more_stats_data),
+                                      "max_cadence": get_data(maxx, cadence, more_stats_data),
+                                      "average_heart_rate": get_data(average, heart_rate, more_stats_data),
+                                      "max_heart_rate": get_data(maxx, heart_rate, more_stats_data)
+                                      })
                 activities_data.append(activity_info)
             else:
                 print(Fore.RED + (dtt.now()).strftime("%Y-%m-%d %H:%M:%S") + " No data fetched for activity "

@@ -1,34 +1,31 @@
 from datetime import datetime
 
 from colorama import Fore
-from selenium import webdriver
 from selenium.common import WebDriverException
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.common.by import By
-from webdriver_manager.chrome import ChromeDriverManager
 
 from src.config.LoadProperties import configs
 
-# Chrome Headless Mode
-options = Options()
-options.headless = True
-options.add_argument("--window-size=1920,1200")
 
-# No Need to download chromedriver,
-# this installs driver everytime to avoid downloading manually every new patch or version of Chrome.
-browser_driver = webdriver.Chrome(options, service=ChromeService(ChromeDriverManager().install()))
-
-
-def login_strava():
+def login_strava(driver):
     try:
         print(Fore.LIGHTWHITE_EX + (datetime.now()).strftime("%Y-%m-%d %H:%M:%S") + " Attempting to login to Strava.")
-        browser_driver.get(configs.get("strava-login-url").data)
-        username = browser_driver.find_element(By.ID, "email")
-        password = browser_driver.find_element(By.ID, "password")
+        driver.get(configs.get("strava-login-url").data)
+        username = driver.find_element(By.ID, "email")
+        password = driver.find_element(By.ID, "password")
         username.send_keys(configs.get("strava-username").data)
         password.send_keys(configs.get("strava-password").data)
-        browser_driver.find_element(By.ID, "login-button").click()
+        driver.find_element(By.ID, "login-button").click()
         print(Fore.GREEN + (datetime.now()).strftime("%Y-%m-%d %H:%M:%S") + " Logged in successfully to Strava.")
     except WebDriverException as webex:
         print(Fore.RED + (datetime.now()).strftime("%Y-%m-%d %H:%M:%S") + " Login Failed : ", webex)
+
+
+def exit_strava(driver):
+    try:
+        print(Fore.LIGHTWHITE_EX + (datetime.now()).strftime("%Y-%m-%d %H:%M:%S") + " Closing Strava session.")
+        driver.close()
+        driver.quit()
+        print(Fore.GREEN + (datetime.now()).strftime("%Y-%m-%d %H:%M:%S") + " Strava session closed.")
+    except WebDriverException as webex:
+        print(Fore.RED + (datetime.now()).strftime("%Y-%m-%d %H:%M:%S") + " Session Closing Failed : ", webex)

@@ -1,4 +1,3 @@
-
 watts = 'watts'
 athlete_id = 'athlete_id'
 athlete_name = 'athlete_name'
@@ -11,3 +10,9 @@ location = "location"
 activity_type = 'type'
 activity_id = 'id'
 html_parser = "html.parser"
+average = 'Avg'
+maxx = 'Max'
+heart_rate = 'Heart Rate'
+cadence = 'Cadence'
+speed = 'Speed'
+power = 'Power'
