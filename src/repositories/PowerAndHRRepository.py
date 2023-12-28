@@ -31,17 +31,26 @@ def save_record(data, table):
     value_placeholders = ', '.join(['%s'] * len(keys))
     insert_sql = f'INSERT INTO public."{table}" ({columns}) VALUES ({value_placeholders})'
     try:
+        if table == "athlete-info":
+            print(Fore.GREEN + (datetime.now()).strftime("%Y-%m-%d %H:%M:%S") +
+                  " Saving athlete info of " + data["athlete_name"] + ", athlete id : " + data[
+                      "athlete_id"] + " in Database.")
+        else:
+            print(Fore.GREEN + (datetime.now()).strftime("%Y-%m-%d %H:%M:%S") +
+                  " Saving data of activity id : " + data["activity_id"] + " in Database.")
         hr_power_db_conn.cursor().execute(insert_sql, tuple(values))
         hr_power_db_conn.commit()
     except IntegrityError as e:
         print(Fore.RED + (datetime.now()).strftime("%Y-%m-%d %H:%M:%S") +
-              " Error occurred while storing data in " + table + " in PostgresSQL:", str(e))
-        print(Fore.LIGHTWHITE_EX + (datetime.now()).strftime("%Y-%m-%d %H:%M:%S") +
-              " Updating the table " + table + " by adding new activity IDs to the existing record of athlete ID: ")
+              " Error occurred while storing data in " + table + "in PostgresSQL:", str(e))
         if table == "athlete-info":
+            print(Fore.LIGHTWHITE_EX + (datetime.now()).strftime("%Y-%m-%d %H:%M:%S") +
+                  " Updating the table " + table + " by adding new activity IDs to the existing record of athlete ID: ")
             update_sql = f'UPDATE public."{table}" SET activities_ids = activities_ids || %s::bigint[] WHERE athlete_id = %s'
             hr_power_db_conn.cursor().execute(update_sql, (data['activities_ids'], data["athlete_id"]))
             hr_power_db_conn.commit()
+            print(Fore.GREEN + (datetime.now()).strftime("%Y-%m-%d %H:%M:%S") +
+                  " New activity IDs added to the existing record of athlete ID")
         else:
             print(Fore.LIGHTWHITE_EX + (datetime.now()).strftime("%Y-%m-%d %H:%M:%S") +
                   " The table is : " + table + ". So check why there is duplicate entry in database for it already.")
@@ -94,6 +103,8 @@ Returns:
 Raises:
     Exception: If the connection to the database fails.
 """
+
+
 def connect_database(host, port, database_name, user, password):
     try:
         # Create a new client and connect to the server
@@ -127,5 +138,7 @@ Read and return athletic data from a SQL database.
 
 :return: A pandas DataFrame containing the athletic data.
 """
+
+
 def get_athletic_data():
     return pd.read_sql(retrieve_data_sql, sql_engine)

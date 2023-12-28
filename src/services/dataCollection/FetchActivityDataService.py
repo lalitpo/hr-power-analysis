@@ -49,28 +49,25 @@ def get_weekly_urls():
 """
 
 
-def get_activity_ids(ath_id):
-    weekly_urls = get_weekly_urls()
+def get_activity_ids(ath_id, week_url):
     try:
         activity_ids_list = []
-        for week_url in weekly_urls:
-            week_url = week_url.replace(athlete_id, ath_id)
-            print(Fore.LIGHTWHITE_EX + (dtt.now()).strftime("%Y-%m-%d %H:%M:%S") + " Collecting activity ids "
-                                                                                   "of: " + week_url)
-            browser_driver.get(week_url)
-            time.sleep(10)
-            div_element = browser_driver.find_element(By.CSS_SELECTOR,
-                                                      "div.content.react-feed-component").get_attribute(
-                "outerHTML")
-            # parse the HTML using BeautifulSoup
-            attribute_list = BeautifulSoup(div_element, html_parser).contents[0].__getattribute__("attrs")
-            activity_list = json.loads(attribute_list["data-react-props"])['appContext']['preFetchedEntries']
+        url = week_url.replace(athlete_id, ath_id)
+        print(Fore.LIGHTWHITE_EX + (dtt.now()).strftime("%Y-%m-%d %H:%M:%S") + " Collecting activity ids "
+                                                                                   "of: " + url)
+        browser_driver.get(url)
+        time.sleep(10)
+        div_element = browser_driver.find_element(By.CSS_SELECTOR, "div.content.react-feed-component").get_attribute(
+            "outerHTML")
+        # parse the HTML using BeautifulSoup
+        attribute_list = BeautifulSoup(div_element, html_parser).contents[0].__getattribute__("attrs")
+        activity_list = json.loads(attribute_list["data-react-props"])['appContext']['preFetchedEntries']
 
-            for act in activity_list:  # Convert minutes and seconds to seconds
-                if act[entity] == "GroupActivity" and act[rowData][activities][0][activity_type] == ride:
-                    activity_ids_list.append(str(act[rowData][activities][0][entity + '_' + activity_id]))
-                elif act[entity] == "Activity" and act[activity][activity_type] == ride:
-                    activity_ids_list.append(act[activity][activity_id])
+        for act in activity_list:  # Convert minutes and seconds to seconds
+            if act[entity] == "GroupActivity" and act[rowData][activities][0][activity_type] == ride:
+                activity_ids_list.append(str(act[rowData][activities][0][entity + '_' + activity_id]))
+            elif act[entity] == "Activity" and act[activity][activity_type] == ride:
+                activity_ids_list.append(act[activity][activity_id])
         return list(set(activity_ids_list))
     except Exception as e:
         print(Fore.RED + (dtt.now()).strftime("%Y-%m-%d %H:%M:%S") + " Error occurred while getting activity "
@@ -210,5 +207,4 @@ def get_activities_data(activities_list):
             print(Fore.RED + (dtt.now()).strftime("%Y-%m-%d %H:%M:%S") +
                   " Error occurred while fetching data for "
                   "activity : ", str(e), act)
-
     return activities_data
