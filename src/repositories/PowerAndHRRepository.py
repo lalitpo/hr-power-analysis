@@ -1,13 +1,12 @@
 from datetime import datetime
 
-import pandas as pd
 import psycopg2
 from colorama import Fore
 from psycopg2 import extensions, OperationalError
 from psycopg2._psycopg import IntegrityError
 from sqlalchemy import create_engine
 
-from src.config.LoadProperties import sql_queries_list, configs, retrieve_data_sql
+from src.config.LoadProperties import sql_queries_list, configs
 
 """
 Saves a record in the specified table.
@@ -132,13 +131,3 @@ hr_power_db_conn = connect_database(db_host, db_port, db_name, db_user, db_passw
 
 # Create a SQL engine using your database connection details
 sql_engine = create_engine('postgresql://' + db_user + ':' + db_password + '@localhost:5432/' + db_name)
-
-"""
-Read and return athletic data from a SQL database.
-
-:return: A pandas DataFrame containing the athletic data.
-"""
-
-
-def get_athletic_data():
-    return pd.read_sql(retrieve_data_sql, sql_engine)

@@ -19,11 +19,12 @@ athlete_ids = open('../resources/pro-athlete-id.txt').readlines()
 def fetch_week_data(week):
     # Chrome Headless Mode
     options = Options()
-    options.headless = True
-    options.add_argument("--window-size=1920,1200")
+    options.add_argument('--headless=new')
+    """
     # STEP 1 : Login into strava with user account configured in strava-config properties file.
     # No Need to download chromedriver,
     # this installs driver everytime to avoid downloading manually every new patch or version of Chrome.
+    """
     browser_driver = webdriver.Chrome(options, service=ChromeService(ChromeDriverManager().install()))
 
     login_strava(browser_driver)
@@ -80,4 +81,4 @@ weekly_urls = get_weekly_urls()
 
 for week_url in weekly_urls:
     fetch_week_data(week_url);
-    time.sleep(1)
+    time.sleep(240)

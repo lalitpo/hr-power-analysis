@@ -55,7 +55,8 @@ def get_activity_ids(browser_driver, ath_id, week_url):
         print(Fore.LIGHTWHITE_EX + (dtt.now()).strftime("%Y-%m-%d %H:%M:%S") + " Collecting activity ids "
                                                                                "of: " + url)
         browser_driver.get(url)
-        time.sleep(10)
+        time.sleep(20)
+
         div_element = browser_driver.find_element(By.CSS_SELECTOR, "div.content.react-feed-component").get_attribute(
             "outerHTML")
         # parse the HTML using BeautifulSoup
@@ -63,9 +64,9 @@ def get_activity_ids(browser_driver, ath_id, week_url):
         activity_list = json.loads(attribute_list["data-react-props"])['appContext']['preFetchedEntries']
 
         for act in activity_list:  # Convert minutes and seconds to seconds
-            if act[entity] == "GroupActivity" and act[rowData][activities][0][activity_type] == ride:
+            if act[entity] == "GroupActivity" and ride.lower() in act[rowData][activities][0][activity_type].lower():
                 activity_ids_list.append(str(act[rowData][activities][0][entity + '_' + activity_id]))
-            elif act[entity] == "Activity" and act[activity][activity_type] == ride:
+            elif act[entity] == "Activity" and ride.lower() in act[activity][activity_type].lower():
                 activity_ids_list.append(act[activity][activity_id])
         return list(set(activity_ids_list))
     except Exception as e:
@@ -166,33 +167,37 @@ def calc_activity_duration(head_data):
 
 def get_data(sub_type, type, stats_data):
     if type == power:
-        if stats_data[3] == sub_type:
-            return ''.join([c for c in stats_data[15] if c.isdigit()])
-        if stats_data[4] == sub_type:
-            return ''.join([c for c in stats_data[16] if c.isdigit()])
         if stats_data[2] == 'Weighted Avg Power':
             return ''.join([c for c in stats_data[1] if c.isdigit()])
+        pow_idx = stats_data.index(power) if power in stats_data else -1
+        if pow_idx != -1 and stats_data[3] == sub_type:
+            return ''.join([c for c in stats_data[pow_idx + 1] if c.isdigit()])
+        if pow_idx != -1 and stats_data[4] == sub_type:
+            return ''.join([c for c in stats_data[pow_idx + 2] if c.isdigit()])
         else:
             return '0'
     if type == speed:
-        if stats_data[3] == sub_type:
-            return ''.join([c if c.isdigit() or c == '.' else '' for c in stats_data[6]])
-        if stats_data[4] == sub_type:
-            return ''.join([c if c.isdigit() or c == '.' else '' for c in stats_data[7]])
+        speed_idx = stats_data.index(speed) if speed in stats_data else -1
+        if speed_idx != -1 and stats_data[3] == sub_type:
+            return ''.join([c if c.isdigit() or c == '.' else '' for c in stats_data[speed_idx + 1]])
+        if speed_idx != -1 and stats_data[4] == sub_type:
+            return ''.join([c if c.isdigit() or c == '.' else '' for c in stats_data[speed_idx + 2]])
         else:
             return '0'
     if type == cadence:
-        if stats_data[3] == sub_type:
-            return ''.join([c for c in stats_data[12] if c.isdigit()])
-        if stats_data[4] == sub_type:
-            return ''.join([c for c in stats_data[13] if c.isdigit()])
+        cadence_idx = stats_data.index(cadence) if cadence in stats_data else -1
+        if cadence_idx != -1 and stats_data[3] == sub_type:
+            return ''.join([c for c in stats_data[cadence_idx + 1] if c.isdigit()])
+        if cadence_idx != -1 and stats_data[4] == sub_type:
+            return ''.join([c for c in stats_data[cadence_idx + 2] if c.isdigit()])
         else:
             return '0'
     if type == heart_rate:
-        if stats_data[3] == sub_type:
-            return ''.join([c for c in stats_data[9] if c.isdigit()])
-        if stats_data[4] == sub_type:
-            return ''.join([c for c in stats_data[10] if c.isdigit()])
+        hr_idx = stats_data.index(heart_rate) if heart_rate in stats_data else -1
+        if hr_idx != -1 and stats_data[3] == sub_type:
+            return ''.join([c for c in stats_data[hr_idx + 1] if c.isdigit()])
+        if hr_idx != -1 and stats_data[4] == sub_type:
+            return ''.join([c for c in stats_data[hr_idx + 2] if c.isdigit()])
         else:
             return '0'
 

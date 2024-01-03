@@ -3,8 +3,6 @@ from datetime import datetime as dt
 from colorama import Fore
 from jproperties import Properties
 
-from src.utils.DataCollectUtils import get_week_numbers
-
 configs = Properties()
 
 with open('/Users/lalit/Desktop/self/Uni/MS Project '
@@ -35,8 +33,15 @@ imp_params = configs.get("params").data.split(",")
 
 data_folder = "Strava Data"
 
-data_period_list = get_week_numbers(configs.get("data-collection-year").data.split(","))
 
+def get_weeks(weeks, year):
+    week_year = [f"{year}{week}" for week in weeks]
+
+    return week_year
+
+
+data_period_list = get_weeks(configs.get("data-collection-week").data.split(","),
+                             configs.get("data-collection-year").data)
 
 def get_data_url():
     base_url = strava_url + "/activities/activity_id/streams?stream_types%5B%5D="
