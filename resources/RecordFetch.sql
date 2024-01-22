@@ -10,8 +10,10 @@ SELECT activity_id,
        altitude,
        cadence,
        time,
-       temp
-FROM public."activity-data"
+       temp,
+       velocity_smooth,
+       moving
+FROM public."activity-data-2"
 WHERE ACTIVITY_ID IN (SELECT unnest(INFO.activities_ids)
                       FROM "athlete-info" AS INFO
                       WHERE athlete_id = (athlete_id)

@@ -24,5 +24,4 @@ def save_athlete_data(athlete_details, ath_act_data):
     print(Fore.GREEN + (datetime.now()).strftime("%Y-%m-%d %H:%M:%S") +
           " Storing " + str(len(ath_act_data)) + " records in athletic-data in Database.")
     for data in ath_act_data:
-        # write_to_csv(athlete_data[athlete_name], athlete_data[athlete_id], data)
         save_record(data, "activity-data")

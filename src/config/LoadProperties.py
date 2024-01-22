@@ -32,7 +32,7 @@ strava_url = configs.get("strava-url").data
 imp_params = configs.get("params").data.split(",")
 
 data_folder = "Strava Data"
-
+remove_columns = configs.get("ignore-columns").data
 
 def get_weeks(weeks, year):
     week_year = [f"{year}{week}" for week in weeks]
