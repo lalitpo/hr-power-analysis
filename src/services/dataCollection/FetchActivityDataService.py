@@ -17,6 +17,8 @@ from src.constants.PowerAndHRConstants import activity_id, power, average, maxx,
 from src.constants.PowerAndHRConstants import (athlete_id, entity, rowData, activities,
                                                activity_type, ride, activity, html_parser)
 
+athlete_type = configs.get("athlete-type").data
+
 """
 Generate a list of weekly activity URLs.
 
@@ -26,7 +28,7 @@ Returns:
 
 
 def get_weekly_urls():
-    base_url = strava_url + "/pros/athlete_id#interval?"
+    base_url = strava_url + "/" + athlete_type.lower() + "/" + "athlete_id#interval?"
     interval_param = configs.get("activity-interval").data.split(",")
     activity_url_list = []
     for k in data_period_list:
@@ -89,7 +91,7 @@ def get_activity_ids(browser_driver, ath_id, week_url):
 
 
 def get_athlete_info(browser_driver, athl_id):
-    athlete_url = strava_url + "/pros/" + athl_id
+    athlete_url = strava_url + "/" + athlete_type.lower() + "/" + athl_id
     browser_driver.get(athlete_url)
     ath_name = browser_driver.find_element(By.CSS_SELECTOR, "h1.text-title1.athlete-name").text
     athlete_location = "NA"
