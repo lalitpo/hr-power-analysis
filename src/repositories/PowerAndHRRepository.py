@@ -106,7 +106,6 @@ Raises:
 
 def connect_database(host, port, database_name, user, password):
     try:
-        # Create a new client and connect to the server
         conn = psycopg2.connect(host=host,
                                 port=port,
                                 database=database_name,
@@ -129,5 +128,4 @@ db_password = configs.get("db-pass").data
 
 hr_power_db_conn = connect_database(db_host, db_port, db_name, db_user, db_password)
 
-# Create a SQL engine using your database connection details
 sql_engine = create_engine('postgresql://' + db_user + ':' + db_password + '@localhost:5432/' + db_name)
