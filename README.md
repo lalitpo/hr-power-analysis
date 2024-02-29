@@ -61,7 +61,6 @@ For this study, we took below steps:
 
 ## Built With
 
-[![My Skills](https://skillicons.dev/icons?i=matlab)](https://www.mathworks.com/products/matlab.html)
 [![My Skills](https://skillicons.dev/icons?i=python)](https://www.python.org/)
 [![My Skills](https://skillicons.dev/icons?i=matlab)](https://www.mathworks.com/products/matlab.html)
 [![My Skills](https://skillicons.dev/icons?i=postgres)](https://www.postgresql.org/)
