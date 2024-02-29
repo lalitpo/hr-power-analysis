@@ -4,7 +4,7 @@
 
 <br />
 <div style="text-align: center;">
-  <h3 align="center">HR-Power-Relation-Modelling</h3>
+  <h3 align="center">HR-Power-Relation-Modeling</h3>
   <p align="center">
     Estimation of Heart Rate to varying power output in endurance activities.
     <br />
@@ -48,9 +48,8 @@ For this study, we took below steps:
     popular physical exercise tracking app called [Strava](https://www.strava.com).
 
 
-2. Data Pre-Processing : This  step includes cleaning, manipulating, dropping, 
-    transforming and replacing missing data with different methods like Data Profiling, Linear Interpolation, etc.
-
+2. Data Pre-Processing : This  step includes cleaning, manipulating, dropping irrelevant attributes and replacing missing data with different methods like Data Profiling, Linear Interpolation, etc.
+    We also implemented our own implementation of segmenting data series to align with pauses taken during the activity.
 
 3. Modeling : This includes applying [Least Squares Approximation](https://de.mathworks.com/help/matlab/ref/lsqr.html) method, and [fmincon](https://de.mathworks.com/help/optim/ug/fmincon.html) in MATLAB
     to estimate the coefficients of first order differential equation.
@@ -62,9 +61,8 @@ For this study, we took below steps:
 
 ## Built With
 
-
+[![My Skills](https://skillicons.dev/icons?i=matlab)](https://www.mathworks.com/products/matlab.html)
 [![My Skills](https://skillicons.dev/icons?i=python)](https://www.python.org/)
-[![My Skills](https://skillicons.dev/icons?i=r)](https://www.r-project.org/)
 [![My Skills](https://skillicons.dev/icons?i=matlab)](https://www.mathworks.com/products/matlab.html)
 [![My Skills](https://skillicons.dev/icons?i=postgres)](https://www.postgresql.org/)
 
@@ -77,13 +75,13 @@ For this study, we took below steps:
 To correctly import and run this project locally, please follow below guidelines and instructions for smooth development process.
 
 ### Prerequisites
-As mentioned above in the "Built with" section, please have Python and R installed on your system.
-You can use [homebrew](https://brew.sh) or straightforward Installation for both [Python](https://www.python.org/) and [R](https://www.r-project.org/) as mentioned on their homepage.
+As mentioned above in the "Built with" section, please have Python installed on your system.
+You can use [homebrew](https://brew.sh) or straightforward Installation for both [Python](https://www.python.org/) as mentioned on their homepage.
 
 MATLAB comes with its own tool called [MATLAB](https://matlab.mathworks.com) which needs to be a licensed version.
 You can have it for free if you're registered with a University or your workplace has its licensed copy.
 
-Python and R can be run and programmed on any IDE like [IntelliJ](https://www.jetbrains.com/idea/), [PyCharm](https://www.jetbrains.com/pycharm/), [VS Code](https://code.visualstudio.com), etc.
+Python can be run and programmed on any IDE like [IntelliJ](https://www.jetbrains.com/idea/), [PyCharm](https://www.jetbrains.com/pycharm/), [VS Code](https://code.visualstudio.com), etc.
 
 ### Installation
 
@@ -103,9 +101,22 @@ Below is an example of how you can set up the project on your local machine.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+## Usage
 
+1. The athlete ID for which the biking ride activities needs to be collected, must be added in resources/pro-athlete-id.txt
+2. The year and week number for which the data needs to be collected must be added in resources/application-config.properties
+3. The database credentials must be added in resources/db-config.properties
+4. The credentials for the user login to Strava must be added in resources/strava-config.properties. 
+4. Run the application using the following command
+
+    ```
+    python3 DataCollectRunner.py
+    ```
  
+5. The model are present in models folder in HR_Model.mlx which needs to be run in MATLAB.
+6. Model results can be analysed on MATLAB or src/services/ModelAnalysis.ipynb
 
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 ## Contributions
