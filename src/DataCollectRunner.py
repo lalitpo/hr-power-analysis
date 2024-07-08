@@ -7,23 +7,25 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
 
+from src.config.LoadProperties import configs
 from src.constants.PowerAndHRConstants import athlete_name
 from src.services.dataCollection.FetchActivityDataService import get_athlete_info, get_activity_ids, \
     get_activities_data, get_weekly_urls
 from src.services.dataCollection.LoginStravaService import login_strava, exit_strava
 from src.services.dataCollection.StoreActivityDataService import save_athlete_data
 
-athlete_ids = open('../resources/pro-athlete-id.txt').readlines()
+athlete_id = configs.get("athlete-id").data
 
 
 def fetch_week_data(week):
     # Chrome Headless Mode
     options = Options()
-    options.add_argument('--headless=new')
+    # options.add_argument('--headless=new')
+
     """
-    # STEP 1 : Login into strava with user account configured in strava-config properties file.
-    # No Need to download chromedriver,
-    # this installs driver everytime to avoid downloading manually every new patch or version of Chrome.
+    STEP 1 : Login into strava with user account configured in strava-config properties file.
+    No need to download chromedriver,
+    This installs driver everytime to avoid downloading manually every new patch or version of Chrome.
     """
     browser_driver = webdriver.Chrome(options, service=ChromeService(ChromeDriverManager().install()))
 
@@ -46,7 +48,6 @@ def fetch_week_data(week):
         print(Fore.LIGHTWHITE_EX + (datetime.now()).strftime("%Y-%m-%d %H:%M:%S") +
               " Total number of activity IDs collected for athlete ID " + ath_bio["athlete_id"] + " : " +
               str(len(act_ids_list)))
-        print(act_ids_list)
         act_data = get_activities_data(driver, act_ids_list)
         return ath_bio, act_data
 
@@ -66,13 +67,12 @@ def fetch_week_data(week):
     def store_in_db(bio, data):
         save_athlete_data(bio, data)
 
-    for athlete_id in athlete_ids:
-        athlete_bio, activities_data = pull_data(browser_driver, athlete_id, week)
-        store_in_db(athlete_bio, activities_data)
-        print(Fore.GREEN + (datetime.now()).strftime("%Y-%m-%d %H:%M:%S") + " Data stored for athlete : " +
-              athlete_bio[
-                  athlete_name] + " with Athlete ID :" + athlete_id)
-        print(Fore.GREEN + (datetime.now()).strftime("%Y-%m-%d %H:%M:%S") + " Closing Chrome session of Strava.")
+    athlete_bio, activities_data = pull_data(browser_driver, athlete_id, week)
+    store_in_db(athlete_bio, activities_data)
+    print(Fore.GREEN + (datetime.now()).strftime("%Y-%m-%d %H:%M:%S") + " Data stored for athlete : " +
+          athlete_bio[
+              athlete_name] + " with Athlete ID :" + athlete_id)
+    print(Fore.GREEN + (datetime.now()).strftime("%Y-%m-%d %H:%M:%S") + " Closing Chrome session of Strava.")
 
     exit_strava(browser_driver)
 
@@ -80,5 +80,5 @@ def fetch_week_data(week):
 weekly_urls = get_weekly_urls()
 
 for week_url in weekly_urls:
-    fetch_week_data(week_url);
+    fetch_week_data(week_url)
     time.sleep(240)

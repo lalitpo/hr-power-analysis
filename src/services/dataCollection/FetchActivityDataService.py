@@ -5,6 +5,8 @@ import time
 import urllib.parse
 from _datetime import datetime as dt
 from datetime import datetime as dtt
+from urllib.request import urlopen, Request
+import requests
 
 from bs4 import BeautifulSoup
 from colorama import Fore
@@ -204,6 +206,12 @@ def get_data(sub_type, type, stats_data):
             return '0'
 
 
+def get_activity_type(a_type):
+    words = a_type.split()
+    act_type = ''.join(word[0].upper() for word in words)
+    return act_type
+
+
 def get_activities_data(browser_driver, activities_list):
     activities_data = []
     for act in activities_list:
@@ -220,18 +228,34 @@ def get_activities_data(browser_driver, activities_list):
                                                          "div.spans8.activity-stats.mt-md.mb-md").get_attribute(
                 "outerHTML")
             main_stats_list = BeautifulSoup(main_stats_div, html_parser).contents[0].__getattribute__("contents")
+            type_info = browser_driver.find_element(By.CSS_SELECTOR,
+                                                    "h2.text-title3.text-book.marginless").get_attribute("outerHTML")
+            type_list = BeautifulSoup(type_info, html_parser).contents[0].__getattribute__("contents")
+            ride_type = re.split(r'\n+', type_list[3].text)[3]
+            if len(main_stats_list) > 9 and main_stats_list[9] is not None:
+                device = re.split(r'\n+', main_stats_list[9].text)[1]
+            elif len(main_stats_list) > 7 and main_stats_list[7] is not None:
+                device = re.split(r'\n+', main_stats_list[7].text)[1]
+            else:
+                device = 'NA'
             head_data = re.split(r'\n+', main_stats_list[1].text)
-            secondary_stats_data = re.split(r'\n+', main_stats_list[3].text)
-            more_stats_data = re.split(r'\n+', main_stats_list[5].text)
+            if len(main_stats_list) < 5:
+                continue
+            else:
+                secondary_stats_data = re.split(r'\n+', main_stats_list[3].text)
+                more_stats_data = re.split(r'\n+', main_stats_list[5].text)
             time.sleep(10)  # latency so that strava doesn't block us for scraping.
-            browser_driver.get(data_url_suffix.replace(activity + '_' + activity_id, act))
+            data_url = data_url_suffix.replace(activity + '_' + activity_id, act)
+            browser_driver.get(data_url)
+            time.sleep(20)
             pre = browser_driver.find_element(By.TAG_NAME, "pre").text
             activity_info = json.loads(pre)
-
             if param_exists(activity_info):
                 activity_duration = calc_activity_duration(head_data)
                 elev = head_data[5].replace(',', '').split(' ')[0]
                 activity_info.update({activity + '_' + activity_id: act.strip(),
+                                      "activity_type": get_activity_type(ride_type),
+                                      "device": device,
                                       "activity_date": dt.strptime(activity_meta_data[1].split(', ')[1],
                                                                    '%d %B %Y').date(),
                                       "activity_distance": head_data[1].split(' ')[0],

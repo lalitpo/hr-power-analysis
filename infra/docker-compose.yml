@@ -1,0 +1,14 @@
+version: '3'
+services:
+  db:
+    container_name: hr-power-db-container
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: hr-power-db
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./DBSchemaQueries.sql:/docker-entrypoint-initdb.d/init.sql

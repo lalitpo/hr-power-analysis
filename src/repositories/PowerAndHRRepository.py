@@ -6,7 +6,7 @@ from psycopg2 import extensions, OperationalError
 from psycopg2._psycopg import IntegrityError
 from sqlalchemy import create_engine
 
-from src.config.LoadProperties import sql_queries_list, configs
+from src.config.LoadProperties import configs
 
 """
 Saves a record in the specified table.
@@ -59,34 +59,6 @@ def save_record(data, table):
 
 
 """
-    Executes a list of SQL queries to create a database schema.
-
-    Args:
-        conn (connection): The database connection object.
-
-    Returns:
-        None
-
-    Raises:
-        OperationalError: If any of the SQL queries fail to execute.
-
-    Prints:
-        "DB Schema creation failed: <error message>" if any query fails.
-        "DB Schema created successfully" if all queries are executed successfully.
-"""
-
-
-def create_schema(conn):
-    for sql_query in sql_queries_list:
-        try:
-            conn.cursor().execute(sql_query)
-            conn.commit()
-        except OperationalError as msg:
-            print(Fore.RED + (datetime.now()).strftime("%Y-%m-%d %H:%M:%S") + " DB Schema creation failed: ", msg)
-    print(Fore.GREEN + (datetime.now()).strftime("%Y-%m-%d %H:%M:%S") + " DB Schema created successfully")
-
-
-"""
 Connects to a PostgreSQL database using the provided connection parameters.
 
 Args:
@@ -104,9 +76,9 @@ Raises:
 """
 
 
-def connect_database(host, port, database_name, user, password):
+def connect_database(port, database_name, user, password):
     try:
-        conn = psycopg2.connect(host=host,
+        conn = psycopg2.connect(host="localhost",
                                 port=port,
                                 database=database_name,
                                 user=user,
@@ -114,18 +86,14 @@ def connect_database(host, port, database_name, user, password):
         print(Fore.GREEN + (datetime.now()).strftime(
             "%Y-%m-%d %H:%M:%S") + " You are successfully connected to " + database_name + " database!")
         conn.set_isolation_level(extensions.ISOLATION_LEVEL_AUTOCOMMIT)
-        create_schema(conn)
         return conn
     except Exception as e:
         print(Fore.RED + (datetime.now()).strftime("%Y-%m-%d %H:%M:%S") + " Database could not be connected : ", e)
 
 
-db_host = configs.get("db-host").data
 db_port = configs.get("db-port").data
 db_name = configs.get("db-name").data
 db_user = configs.get("db-user").data
 db_password = configs.get("db-pass").data
 
-hr_power_db_conn = connect_database(db_host, db_port, db_name, db_user, db_password)
-
-sql_engine = create_engine('postgresql://' + db_user + ':' + db_password + '@localhost:5432/' + db_name)
+hr_power_db_conn = connect_database(db_port, db_name, db_user, db_password)
